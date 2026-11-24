@@ -50,9 +50,18 @@ interface Store {
   wins: { level: number; finishedAt: number; score: number }[];
 }
 
-const DEFAULT_AVATAR: AvatarConfig = {
+export const GUEST_DEFAULT_AVATAR: AvatarConfig = {
   v: 1, skin: "#eab68f", hair: "short", hairColor: "#6b3e1f", outfit: "#3b82f6", accessory: "cap",
 };
+
+/** True once this browser has played as a guest (reading state would create it). */
+export function hasGuestProgress(): boolean {
+  try {
+    return localStorage.getItem(STORE_KEY) !== null;
+  } catch {
+    return false;
+  }
+}
 
 function load(): Store {
   try {
@@ -64,7 +73,7 @@ function load(): Store {
   } catch {
     // storage blocked or corrupt: start fresh
   }
-  return { v: 1, avatar: DEFAULT_AVATAR, ledger: {}, quests: {}, wins: [] };
+  return { v: 1, avatar: GUEST_DEFAULT_AVATAR, ledger: {}, quests: {}, wins: [] };
 }
 
 function save(s: Store) {

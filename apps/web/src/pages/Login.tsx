@@ -1,7 +1,8 @@
 import { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api, auth, ApiError } from "../lib/api";
+import { safeNext, withNext } from "../lib/redirect";
 import { AuthLayout } from "../components/AuthLayout";
 
 interface LoginResponse {
@@ -13,6 +14,8 @@ interface LoginResponse {
 export function Login() {
   const { t } = useTranslation();
   const nav = useNavigate();
+  const [params] = useSearchParams();
+  const next = safeNext(params.get("next"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState<boolean>(auth.getRememberMe());
@@ -27,7 +30,7 @@ export function Login() {
       const res = await api.post<LoginResponse>("/auth/login", { email, password });
       auth.setTokens(res.accessToken, res.refreshToken, remember);
       if (res.memberships[0]) auth.setFamilyId(res.memberships[0].familyId);
-      nav("/");
+      nav(next);
     } catch (e) {
       setErr(e instanceof ApiError ? e.message : t("auth.loginError"));
     } finally {
@@ -64,7 +67,7 @@ export function Login() {
         {err && <div className="err">{err}</div>}
       </form>
       <p className="muted" style={{ marginTop: 16 }}>
-        {t("auth.noAccountQ")} <Link to="/register" className="auth-link">{t("auth.createLink")}</Link>
+        {t("auth.noAccountQ")} <Link to={withNext("/register", next)} className="auth-link">{t("auth.createLink")}</Link>
       </p>
     </AuthLayout>
   );

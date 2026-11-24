@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { ApiError, auth } from "../lib/api";
@@ -15,6 +15,7 @@ import { MemoryIntro, MemoryResultView } from "../game/ui/MemoryPanels";
 import { ChestIcon, GateIcon, MapIcon, OwlIcon, RewardChips, ScrollIcon, ShirtIcon, SwapIcon } from "../game/ui/icons";
 import { Coach, Minimap, MenuButton, PlayerCard, QuestTracker, pickObjective, type CoachStep } from "../game/ui/Hud";
 import { SPAWN } from "../game/world";
+import { markPlayed } from "../platform/recent";
 import "../game/game.css";
 
 const PLAYER_KEY = "fh.game.playerId";
@@ -150,7 +151,10 @@ export function GameSession({
   const qc = useQueryClient();
   const label = useResourceLabel();
   const bridge = useMemo(() => new GameBridge(), []);
-  const [panel, setPanel] = useState<PanelState | null>(null);
+  const [params] = useSearchParams();
+  // `?open=avatar` comes from the lobby's "Customize avatar" button.
+  const [panel, setPanel] = useState<PanelState | null>(() => (params.get("open") === "avatar" ? { kind: "avatar" } : null));
+  useEffect(() => markPlayed("family-adventure"), []);
   const [nearby, setNearby] = useState<InteractableId | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -369,7 +373,7 @@ export function GameSession({
               />
               {canSwitch && <MenuButton icon={<SwapIcon />} label={t("game.ui.switchPlayer")} onClick={() => onSwitch?.()} />}
               {backend.guest ? (
-                <Link to="/register" className="g-link g-link-cta">{t("game.guest.save")}</Link>
+                <Link to="/register?next=/play" className="g-link g-link-cta">{t("game.guest.save")}</Link>
               ) : (
                 <Link to="/" className="g-link">{t("game.ui.dashboard")}</Link>
               )}

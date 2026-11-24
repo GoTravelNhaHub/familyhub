@@ -23,7 +23,8 @@
     "requests": "Yêu cầu",
     "family": "Gia đình",
     "calendar": "Lịch",
-    "play": "Phiêu lưu"
+    "play": "Phiêu lưu",
+    "members": "Thành viên"
   },
   "landing": {
     "navLogin": "Đăng nhập",
@@ -118,7 +119,8 @@
     "grownUps": "Người lớn",
     "adventureTitle": "Thế giới phiêu lưu gia đình",
     "adventureText": "Khám phá ngôi làng, nhận nhiệm vụ từ việc thật và chơi trò chơi nhỏ.",
-    "adventureGo": "Chơi ▸"
+    "adventureGo": "Chơi ▸",
+    "addKidsHintMembers": "Mở Thành viên và thêm một bé để bắt đầu."
   },
   "tasks": {
     "title": "✅ Việc hôm nay",
@@ -411,7 +413,7 @@
       "name": "Nhà thám hiểm",
       "banner": "Chế độ khách: tiến trình chỉ lưu trên thiết bị này.",
       "signUp": "Đăng ký miễn phí",
-      "save": "Đăng ký để lưu",
+      "save": "Tạo tài khoản",
       "boardHint": "Tạo tài khoản gia đình miễn phí để biến việc nhà và bài tập thật thành nhiệm vụ ở đây."
     },
     "track": {
@@ -434,6 +436,88 @@
       "talkTouch": "Đi theo ánh sáng vàng đến Hướng dẫn viên làng, rồi chạm vào họ.",
       "quests": "Mở Nhiệm vụ bất cứ lúc nào để xem việc cần làm tiếp.",
       "skip": "Bỏ qua"
+    }
+  },
+  "platform": {
+    "nav": {
+      "label": "Điều hướng chính",
+      "home": "Trang chính",
+      "discover": "Khám phá",
+      "play": "Chơi",
+      "join": "Tham gia"
+    },
+    "kicker": {
+      "featured": "Thế giới nổi bật",
+      "continue": "Chơi tiếp"
+    },
+    "world": {
+      "family-adventure": {
+        "title": "Phiêu lưu gia đình",
+        "desc": "Khám phá ngôi làng gia đình, gặp Hướng dẫn viên làng và Giáo sư Cú, làm nhiệm vụ và mở rương báu mỗi ngày."
+      },
+      "learning-academy": {
+        "title": "Học viện",
+        "desc": "Trò chơi trí tuệ cho bé ham học: số, chữ và thử thách trí nhớ."
+      },
+      "adventure-forest": {
+        "title": "Khu rừng phiêu lưu",
+        "desc": "Lối đi bí mật, săn kho báu và bí ẩn khu rừng sau cổng làng."
+      },
+      "creative-home": {
+        "title": "Ngôi nhà sáng tạo",
+        "desc": "Cùng nhau trang trí phòng và xây ngôi nhà gia đình."
+      },
+      "puzzle-island": {
+        "title": "Đảo câu đố",
+        "desc": "Câu đố ngắn chơi đi chơi lại: hình mẫu, mê cung và logic."
+      }
+    },
+    "category": {
+      "adventure": "Phiêu lưu",
+      "learning": "Học tập",
+      "creative": "Sáng tạo",
+      "puzzle": "Câu đố"
+    },
+    "guestFriendly": "Không cần tài khoản",
+    "devices": "Máy tính, máy tính bảng và điện thoại",
+    "playNow": "Chơi ngay",
+    "continue": "Tiếp tục phiêu lưu",
+    "play": "Chơi",
+    "customizeAvatar": "Tùy chỉnh nhân vật",
+    "signUp": "Đăng ký miễn phí",
+    "comingSoon": "Sắp ra mắt",
+    "accountOnly": "Cần tài khoản gia đình",
+    "player": {
+      "title": "Nhà thám hiểm của bạn",
+      "xp": "{{into}} / {{span}} XP để lên cấp {{next}}",
+      "questsWaiting_one": "Có {{count}} nhiệm vụ đang chờ bạn.",
+      "questsWaiting_other": "Có {{count}} nhiệm vụ đang chờ bạn.",
+      "allCaughtUp": "Xong hết rồi! Đi dạo quanh làng để tìm thêm nhé.",
+      "newPlayer": "Bắt đầu chuyến phiêu lưu đầu tiên để nhận XP.",
+      "localOnly": "Tiến trình khách chỉ lưu trên thiết bị này.",
+      "error": "Chưa tải được tiến trình của bạn. Bạn vẫn có thể chơi."
+    },
+    "family": {
+      "title": "Gia đình bạn",
+      "open": "Mở bảng gia đình",
+      "parentHint": "Việc cần làm, phần thưởng, duyệt yêu cầu và lịch.",
+      "childHint": "Việc của bạn, sao và phần thưởng gia đình."
+    },
+    "account": {
+      "title": "Cả nhà cùng chơi",
+      "b1": "Biến việc nhà và bài tập thật thành nhiệm vụ",
+      "b2": "Kiếm sao và đổi lấy phần thưởng gia đình",
+      "b3": "Người lớn duyệt phần thưởng và quản lý gia đình",
+      "signUp": "Tạo tài khoản gia đình miễn phí",
+      "login": "Tôi đã có tài khoản",
+      "note": "Tiến trình khách vẫn ở trên thiết bị này. Hiện chưa chuyển sang tài khoản mới.",
+      "learn": "Family Hub hoạt động thế nào"
+    },
+    "discover": {
+      "title": "Khám phá thế giới",
+      "sub": "Thế giới mới đang trên đường tới. Chỉ những thế giới đã hoàn thiện mới chơi được.",
+      "all": "Tất cả",
+      "filter": "Lọc thế giới theo loại"
     }
   }
 }

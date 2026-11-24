@@ -23,7 +23,8 @@
     "requests": "申请",
     "family": "家庭",
     "calendar": "日历",
-    "play": "冒险"
+    "play": "冒险",
+    "members": "成员"
   },
   "landing": {
     "navLogin": "登录",
@@ -118,7 +119,8 @@
     "grownUps": "家长们",
     "adventureTitle": "家庭冒险世界",
     "adventureText": "探索村庄，把真实任务变成冒险任务，还能玩小游戏。",
-    "adventureGo": "开始 ▸"
+    "adventureGo": "开始 ▸",
+    "addKidsHintMembers": "打开“成员”，添加一个孩子就能开始。"
   },
   "tasks": {
     "title": "✅ 今日任务",
@@ -411,7 +413,7 @@
       "name": "探险家",
       "banner": "游客模式：进度只保存在这台设备上。",
       "signUp": "免费注册",
-      "save": "注册以保存",
+      "save": "创建账户",
       "boardHint": "创建免费家庭账户，就能把真实的家务和作业变成这里的任务。"
     },
     "track": {
@@ -434,6 +436,88 @@
       "talkTouch": "跟着金色的光找到村庄向导，然后点一下他们。",
       "quests": "随时打开“任务”，看看下一步做什么。",
       "skip": "跳过"
+    }
+  },
+  "platform": {
+    "nav": {
+      "label": "主导航",
+      "home": "首页",
+      "discover": "发现",
+      "play": "开始玩",
+      "join": "加入"
+    },
+    "kicker": {
+      "featured": "精选世界",
+      "continue": "继续游戏"
+    },
+    "world": {
+      "family-adventure": {
+        "title": "家庭冒险",
+        "desc": "探索家庭村庄，认识村庄向导和猫头鹰教授，完成任务，打开每日宝箱。"
+      },
+      "learning-academy": {
+        "title": "学习学院",
+        "desc": "给好奇宝宝的益智游戏：数字、文字和记忆挑战。"
+      },
+      "adventure-forest": {
+        "title": "冒险森林",
+        "desc": "村庄大门外的秘密小路、寻宝和森林奥秘。"
+      },
+      "creative-home": {
+        "title": "创意家园",
+        "desc": "一起装饰房间，建造你们的家。"
+      },
+      "puzzle-island": {
+        "title": "谜题岛",
+        "desc": "可以反复玩的小谜题：图案、迷宫和逻辑。"
+      }
+    },
+    "category": {
+      "adventure": "冒险",
+      "learning": "学习",
+      "creative": "创意",
+      "puzzle": "谜题"
+    },
+    "guestFriendly": "无需账户",
+    "devices": "电脑、平板和手机",
+    "playNow": "马上开始",
+    "continue": "继续冒险",
+    "play": "开始",
+    "customizeAvatar": "装扮角色",
+    "signUp": "免费注册",
+    "comingSoon": "即将推出",
+    "accountOnly": "需要家庭账户",
+    "player": {
+      "title": "你的探险家",
+      "xp": "{{into}} / {{span}} 经验，升到 {{next}} 级",
+      "questsWaiting_one": "有 {{count}} 个任务在等你。",
+      "questsWaiting_other": "有 {{count}} 个任务在等你。",
+      "allCaughtUp": "都完成啦！去村子里看看还有什么。",
+      "newPlayer": "开始第一次冒险来获得经验。",
+      "localOnly": "游客进度只保存在这台设备上。",
+      "error": "暂时无法加载你的进度，但你仍然可以玩。"
+    },
+    "family": {
+      "title": "你的家庭",
+      "open": "打开家庭面板",
+      "parentHint": "任务、奖励、审批和日历。",
+      "childHint": "你的任务、星星和家庭奖励。"
+    },
+    "account": {
+      "title": "全家一起玩",
+      "b1": "把真实的家务和作业变成任务",
+      "b2": "赚星星，兑换家庭奖励",
+      "b3": "家长审批奖励并管理家庭",
+      "signUp": "创建免费家庭账户",
+      "login": "我已有账户",
+      "note": "游客进度保留在这台设备上，暂时不会转移到新账户。",
+      "learn": "了解 Family Hub"
+    },
+    "discover": {
+      "title": "发现世界",
+      "sub": "更多世界正在路上。只有完成的世界才能玩。",
+      "all": "全部",
+      "filter": "按类型筛选世界"
     }
   }
 }

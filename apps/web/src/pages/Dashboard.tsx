@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { api } from "../lib/api";
+import { flags } from "../lib/flags";
 import type { Member, StarBalance, Task, TaskCompletion } from "../lib/types";
 
 const WEEKDAY_INDEX_TO_ISO = [7, 1, 2, 3, 4, 5, 6];
@@ -48,10 +49,17 @@ export function Dashboard() {
         <span className="adventure-cta-go">{t("dashboard.adventureGo")}</span>
       </Link>
 
+      {flags.gameFirstHome && (
+        // Members left the phone tab bar when Home became the game lobby.
+        <p className="muted" style={{ marginTop: -4 }}>
+          <Link to="/members">👨‍👩‍👧 {t("nav.members")}</Link>
+        </p>
+      )}
+
       {kids.length === 0 && (
         <div className="card">
           <h2>{t("dashboard.addKidsFirst")}</h2>
-          <p className="muted">{t("dashboard.addKidsHint")}</p>
+          <p className="muted">{t(flags.gameFirstHome ? "dashboard.addKidsHintMembers" : "dashboard.addKidsHint")}</p>
         </div>
       )}
 

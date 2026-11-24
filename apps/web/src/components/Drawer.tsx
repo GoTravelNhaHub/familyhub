@@ -1,16 +1,8 @@
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { NAV_ITEMS } from "./navItems";
 
-interface NavItem { to: string; emoji: string; key: string }
-const NAV: NavItem[] = [
-  { to: "/", emoji: "🏠", key: "nav.home" },
-  { to: "/play", emoji: "🗺️", key: "nav.play" },
-  { to: "/tasks", emoji: "✅", key: "nav.tasks" },
-  { to: "/rewards", emoji: "🎁", key: "nav.rewards" },
-  { to: "/redemptions", emoji: "📬", key: "nav.requests" },
-  { to: "/members", emoji: "👨‍👩‍👧", key: "nav.family" },
-  { to: "/events", emoji: "📅", key: "nav.calendar" },
-];
+const NAV = NAV_ITEMS;
 
 interface DrawerProps {
   open: boolean;

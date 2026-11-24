@@ -23,7 +23,8 @@
     "requests": "Requests",
     "family": "Family",
     "calendar": "Calendar",
-    "play": "Adventure"
+    "play": "Adventure",
+    "members": "Members"
   },
   "landing": {
     "navLogin": "Log in",
@@ -118,7 +119,8 @@
     "grownUps": "Grown-ups",
     "adventureTitle": "Family Adventure World",
     "adventureText": "Explore the village, take quests from real tasks, and play mini-games.",
-    "adventureGo": "Play ▸"
+    "adventureGo": "Play ▸",
+    "addKidsHintMembers": "Open Members and add a child to get started."
   },
   "tasks": {
     "title": "✅ Today's tasks",
@@ -411,7 +413,7 @@
       "name": "Explorer",
       "banner": "Guest mode: progress is saved on this device only.",
       "signUp": "Sign up free",
-      "save": "Sign up to save",
+      "save": "Create account",
       "boardHint": "Create a free family account to turn real chores and homework into quests here."
     },
     "track": {
@@ -434,6 +436,88 @@
       "talkTouch": "Follow the golden light to the Village Guide, then tap them.",
       "quests": "Open Quests anytime to see what to do next.",
       "skip": "Skip"
+    }
+  },
+  "platform": {
+    "nav": {
+      "label": "Main",
+      "home": "Home",
+      "discover": "Discover",
+      "play": "Play",
+      "join": "Join"
+    },
+    "kicker": {
+      "featured": "Featured world",
+      "continue": "Continue playing"
+    },
+    "world": {
+      "family-adventure": {
+        "title": "Family Adventure",
+        "desc": "Explore the family village, meet the Village Guide and Professor Owl, finish quests, and open the daily treasure chest."
+      },
+      "learning-academy": {
+        "title": "Learning Academy",
+        "desc": "Brain games for curious minds: numbers, words, and memory challenges."
+      },
+      "adventure-forest": {
+        "title": "Adventure Forest",
+        "desc": "Hidden paths, treasure hunts, and forest secrets past the village gate."
+      },
+      "creative-home": {
+        "title": "Creative Home",
+        "desc": "Decorate rooms and build your family home together."
+      },
+      "puzzle-island": {
+        "title": "Puzzle Island",
+        "desc": "Quick, replayable puzzles: patterns, mazes, and logic."
+      }
+    },
+    "category": {
+      "adventure": "Adventure",
+      "learning": "Learning",
+      "creative": "Creative",
+      "puzzle": "Puzzle"
+    },
+    "guestFriendly": "No account needed",
+    "devices": "Computer, tablet, and phone",
+    "playNow": "Play now",
+    "continue": "Continue adventure",
+    "play": "Play",
+    "customizeAvatar": "Customize avatar",
+    "signUp": "Sign up free",
+    "comingSoon": "Coming soon",
+    "accountOnly": "Needs a family account",
+    "player": {
+      "title": "Your explorer",
+      "xp": "{{into}} / {{span}} XP to level {{next}}",
+      "questsWaiting_one": "{{count}} quest is waiting for you.",
+      "questsWaiting_other": "{{count}} quests are waiting for you.",
+      "allCaughtUp": "All caught up! Explore the village for more.",
+      "newPlayer": "Start your first adventure to earn XP.",
+      "localOnly": "Guest progress is saved on this device only.",
+      "error": "We couldn't load your progress. You can still play."
+    },
+    "family": {
+      "title": "Your family",
+      "open": "Open family dashboard",
+      "parentHint": "Tasks, rewards, approvals, and the calendar.",
+      "childHint": "Your tasks, stars, and family rewards."
+    },
+    "account": {
+      "title": "Play together as a family",
+      "b1": "Turn real chores and homework into quests",
+      "b2": "Earn stars and trade them for family rewards",
+      "b3": "Grown-ups approve rewards and manage the family",
+      "signUp": "Create a free family account",
+      "login": "I have an account",
+      "note": "Guest progress stays on this device. It is not moved into a new account yet.",
+      "learn": "How Family Hub works"
+    },
+    "discover": {
+      "title": "Discover worlds",
+      "sub": "New worlds are on the way. Only finished worlds can be played.",
+      "all": "All",
+      "filter": "Filter worlds by type"
     }
   }
 }

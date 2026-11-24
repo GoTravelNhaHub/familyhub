@@ -13,8 +13,8 @@ export default function GuestPlayPage() {
       <header className="guest-bar">
         <Link to="/" className="guest-brand">{t("common.appName")}</Link>
         <span className="guest-note">{t("game.guest.banner")}</span>
-        <Link to="/login" className="land-link">{t("common.login")}</Link>
-        <Link to="/register"><button type="button">{t("game.guest.signUp")}</button></Link>
+        <Link to="/login?next=/play" className="land-link">{t("common.login")}</Link>
+        <Link to="/register?next=/play"><button type="button">{t("game.guest.signUp")}</button></Link>
       </header>
       <GameSession backend={backend} />
     </div>

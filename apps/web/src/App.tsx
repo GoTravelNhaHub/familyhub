@@ -15,6 +15,8 @@ import { EventsPage } from "./pages/Events";
 import { TopBar } from "./components/TopBar";
 import { Drawer } from "./components/Drawer";
 import { BottomTabs } from "./components/BottomTabs";
+import { Lobby } from "./platform/Lobby";
+import { flags } from "./lib/flags";
 
 // Phaser is large; keep it out of the main bundle until someone opens the game.
 const PlayPage = lazy(() => import("./pages/Play"));
@@ -99,7 +101,15 @@ export function App() {
           element={
             <Shell>
               <Routes>
-                <Route index element={<Dashboard />} />
+                {flags.gameFirstHome ? (
+                  <>
+                    <Route index element={<Lobby signedIn />} />
+                    <Route path="discover" element={<Lobby signedIn />} />
+                    <Route path="family" element={<Dashboard />} />
+                  </>
+                ) : (
+                  <Route index element={<Dashboard />} />
+                )}
                 <Route path="members" element={<MembersPage />} />
                 <Route path="tasks" element={<TasksPage />} />
                 <Route path="rewards" element={<RewardsPage />} />
@@ -127,7 +137,14 @@ export function App() {
               </Suspense>
             }
           />
-          <Route path="/*" element={<Landing />} />
+          {flags.gameFirstHome ? (
+            <>
+              <Route path="/welcome" element={<Landing />} />
+              <Route path="/*" element={<Lobby signedIn={false} />} />
+            </>
+          ) : (
+            <Route path="/*" element={<Landing />} />
+          )}
         </>
       )}
     </Routes>
