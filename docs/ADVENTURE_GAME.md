@@ -30,6 +30,10 @@ A playable village at `/play` (nav: **Adventure**) layered on the existing app. 
   - `prefers-reduced-motion` disables tweens, particles, and fades.
 - Copy: `game.*` keys in `packages/core/src/i18n/{en,zh,vi}.json`.
 
+## Learning Academy
+
+`/academy` (`apps/web/src/academy`) is the second world. It shares the player, resources, memory rules, and sessions with the village (a win in either place counts for the "Scattered Crystals" quest). Badges are defined in `apps/api/src/game/achievements.ts` (authoritative) and mirrored in `packages/core/src/achievements.ts` for guests.
+
 ## Guest mode
 
 Signed-out visitors can open `/play` (or click "Play as guest" on the landing page). The same `GameSession` UI runs on a local engine (`apps/web/src/game/guest.ts`) instead of the API:

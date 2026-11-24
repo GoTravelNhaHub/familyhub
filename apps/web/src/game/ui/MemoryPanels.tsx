@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { MemoryLevelState, MemoryResult } from "../types";
 import { RewardChips } from "./icons";
@@ -58,6 +59,8 @@ export function MemoryResultView({
   onReplay,
   onNext,
   onExit,
+  exitLabel,
+  children,
 }: {
   result: MemoryResult;
   level: number;
@@ -66,6 +69,10 @@ export function MemoryResultView({
   onReplay: () => void;
   onNext: () => void;
   onExit: () => void;
+  /** Defaults to "Back to the village". */
+  exitLabel?: string;
+  /** Extra result details (badges, personal best) shown above the actions. */
+  children?: ReactNode;
 }) {
   const { t } = useTranslation();
   const label = useResourceLabel();
@@ -98,8 +105,9 @@ export function MemoryResultView({
       ) : (
         <p className="g-result-title">{t(result.error === "too_fast" ? "game.memory.tooFast" : "game.memory.notCleared")}</p>
       )}
+      {children}
       <div className="g-actions">
-        <button type="button" className="ghost" onClick={onExit}>{t("game.memory.backToVillage")}</button>
+        <button type="button" className="ghost" onClick={onExit}>{exitLabel ?? t("game.memory.backToVillage")}</button>
         <button type="button" disabled={busy} onClick={onReplay}>{t("game.memory.again")}</button>
         {result.won && level < 3 && nextUnlocked && (
           <button type="button" className="happy" disabled={busy} onClick={onNext}>{t("game.memory.next")}</button>

@@ -23,6 +23,12 @@ describe("world registry", () => {
     expect(canLaunchWorld(f, { guest: true })).toBe(true);
   });
 
+  it("lists the Learning Academy as a playable guest world at /academy", () => {
+    const academy = WORLDS.find((w) => w.id === "learning-academy")!;
+    expect(academy.entryRoute).toBe("/academy");
+    expect(canLaunchWorld(academy, { guest: true })).toBe(true);
+  });
+
   it("never lets unfinished worlds launch", () => {
     for (const w of WORLDS.filter((x) => x.status !== "available")) {
       expect(canLaunchWorld(w, { guest: false })).toBe(false);

@@ -21,6 +21,8 @@ import { flags } from "./lib/flags";
 // Phaser is large; keep it out of the main bundle until someone opens the game.
 const PlayPage = lazy(() => import("./pages/Play"));
 const GuestPlayPage = lazy(() => import("./pages/GuestPlay"));
+const AcademyPage = lazy(() => import("./pages/Academy"));
+const GuestAcademyPage = lazy(() => import("./pages/GuestAcademy"));
 
 const DRAWER_COLLAPSED_KEY = "fh.drawerCollapsed";
 const MOBILE_BREAKPOINT = 820;
@@ -116,6 +118,14 @@ export function App() {
                 <Route path="redemptions" element={<RedemptionsPage />} />
                 <Route path="events" element={<EventsPage />} />
                 <Route
+                  path="academy"
+                  element={
+                    <Suspense fallback={<div className="card">…</div>}>
+                      <AcademyPage />
+                    </Suspense>
+                  }
+                />
+                <Route
                   path="play"
                   element={
                     <Suspense fallback={<div className="card">…</div>}>
@@ -134,6 +144,14 @@ export function App() {
             element={
               <Suspense fallback={<div className="card">…</div>}>
                 <GuestPlayPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/academy"
+            element={
+              <Suspense fallback={<div className="card">…</div>}>
+                <GuestAcademyPage />
               </Suspense>
             }
           />

@@ -139,7 +139,8 @@ export class MemoryScene extends Phaser.Scene {
 
   private leave() {
     this.scene.stop();
-    this.scene.wake("village");
+    // In board-only mode (Learning Academy) the host page unmounts the game instead.
+    if (this.scene.manager.keys["village"]) this.scene.wake("village");
   }
 
   private layout() {

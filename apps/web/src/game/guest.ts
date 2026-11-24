@@ -6,6 +6,7 @@
 import { ApiError } from "../lib/api";
 import type { AvatarConfig } from "./avatar";
 import type { GameBackend } from "./gameApi";
+import { ACHIEVEMENTS, achievementSourceKey, newlyUnlocked, type MemoryWinRecord } from "@family-hub/core";
 import type { GameState, LevelInfo, MemoryResult, MemorySession, Quest, Resources, ZoneKey } from "./types";
 
 const STORE_KEY = "fh.guest.v1";
@@ -47,7 +48,10 @@ interface Store {
   ledger: Record<string, Resources>;
   /** "questKey|period" -> progress */
   quests: Record<string, { status: "active" | "rewarded" | "cancelled"; acceptedAt: number }>;
-  wins: { level: number; finishedAt: number; score: number }[];
+  /** Accepted wins. moves/durationMs/day exist on wins recorded since achievements shipped. */
+  wins: { level: number; finishedAt: number; score: number; moves?: number; durationMs?: number; day?: string }[];
+  /** Finished runs (won or not), newest first, capped. */
+  runs?: { level: number; won: boolean; score: number; moves: number; durationMs: number; finishedAt: number }[];
 }
 
 export const GUEST_DEFAULT_AVATAR: AvatarConfig = {
@@ -152,9 +156,15 @@ function stateOf(s: Store, name: string): GameState {
         unlocked: l.level <= maxWon + 1,
         rewardedToday: !!s.ledger[`minigame:memory:${today}:L${l.level}`],
         best: s.wins.filter((w) => w.level === l.level).reduce((a, w) => Math.max(a, w.score), 0),
+        wins: s.wins.filter((w) => w.level === l.level).length,
         reward: memoryReward(l.level),
       })),
+      recent: (s.runs ?? []).map((r) => ({ ...r, finishedAt: new Date(r.finishedAt).toISOString() })),
     },
+    achievements: ACHIEVEMENTS.map((a) => {
+      const row = s.ledger[achievementSourceKey(a.key)];
+      return { key: a.key, reward: a.reward, unlocked: !!row, unlockedAt: null };
+    }),
   };
 }
 
@@ -251,13 +261,28 @@ export function guestBackend(name: string): GameBackend {
         }
         const tooFast = durationMs < cfg.pairs * MIN_MS_PER_PAIR;
         const won = matched.size === session.deck.length && !tooFast;
-        if (!won) return { won: false, moves, score: 0, durationMs, reward: null, error: tooFast ? "too_fast" : null };
         const extra = Math.max(0, moves - cfg.pairs);
-        const score = Math.max(10 * cfg.pairs, 100 * cfg.pairs * cfg.level - extra * 15 - Math.round(durationMs / 1000) * 2);
-        s.wins.push({ level: cfg.level, finishedAt: Date.now(), score });
+        const score = won ? Math.max(10 * cfg.pairs, 100 * cfg.pairs * cfg.level - extra * 15 - Math.round(durationMs / 1000) * 2) : 0;
+        s.runs = [{ level: cfg.level, won, score, moves, durationMs, finishedAt: Date.now() }, ...(s.runs ?? [])].slice(0, 8);
+        if (!won) return { won: false, moves, score: 0, durationMs, reward: null, achievements: [], error: tooFast ? "too_fast" : null };
+        s.wins.push({ level: cfg.level, finishedAt: Date.now(), score, moves, durationMs, day: localDate() });
         const reward = memoryReward(cfg.level);
         const fresh = grant(s, `minigame:memory:${localDate()}:L${cfg.level}`, reward);
-        return { won: true, moves, score, durationMs, reward: fresh ? reward : null, error: null };
+        // Same rules as the API (apps/api/src/game/achievements.ts); older wins without stats only count toward level badges.
+        const records: MemoryWinRecord[] = s.wins.map((w) => ({
+          level: w.level,
+          pairs: MEMORY_LEVELS.find((l) => l.level === w.level)?.pairs ?? 0,
+          moves: w.moves ?? Number.MAX_SAFE_INTEGER,
+          durationMs: w.durationMs ?? Number.MAX_SAFE_INTEGER,
+          day: w.day ?? localDate(new Date(w.finishedAt)),
+        }));
+        const already = ACHIEVEMENTS.filter((a) => s.ledger[achievementSourceKey(a.key)]).map((a) => a.key);
+        const unlocked = newlyUnlocked(records, already);
+        for (const a of unlocked) grant(s, achievementSourceKey(a.key), a.reward);
+        return {
+          won: true, moves, score, durationMs, reward: fresh ? reward : null,
+          achievements: unlocked.map((a) => ({ key: a.key, reward: a.reward })), error: null,
+        };
       }),
   };
 }

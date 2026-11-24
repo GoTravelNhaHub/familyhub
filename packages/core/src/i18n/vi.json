@@ -436,6 +436,34 @@
       "talkTouch": "Đi theo ánh sáng vàng đến Hướng dẫn viên làng, rồi chạm vào họ.",
       "quests": "Mở Nhiệm vụ bất cứ lúc nào để xem việc cần làm tiếp.",
       "skip": "Bỏ qua"
+    },
+    "achievement": {
+      "academy": {
+        "first_crystal": {
+          "title": "Viên pha lê đầu tiên",
+          "desc": "Hoàn thành bất kỳ bàn Pha lê Trí nhớ nào."
+        },
+        "scholar": {
+          "title": "Học giả",
+          "desc": "Hoàn thành bàn Học giả."
+        },
+        "master": {
+          "title": "Bậc thầy trí nhớ",
+          "desc": "Hoàn thành bàn Bậc thầy."
+        },
+        "flawless": {
+          "title": "Không sai lượt nào",
+          "desc": "Hoàn thành một bàn với một lượt cho mỗi cặp."
+        },
+        "quick": {
+          "title": "Nhanh trí",
+          "desc": "Hoàn thành một bàn dưới 4 giây mỗi cặp."
+        },
+        "dedicated": {
+          "title": "Chăm học",
+          "desc": "Hoàn thành bàn vào ba ngày khác nhau."
+        }
+      }
     }
   },
   "platform": {
@@ -457,7 +485,7 @@
       },
       "learning-academy": {
         "title": "Học viện",
-        "desc": "Trò chơi trí tuệ cho bé ham học: số, chữ và thử thách trí nhớ."
+        "desc": "Thử thách Pha lê Trí nhớ của Giáo sư Cú: ba mức độ, tính điểm và huy hiệu để sưu tầm."
       },
       "adventure-forest": {
         "title": "Khu rừng phiêu lưu",
@@ -518,6 +546,66 @@
       "sub": "Thế giới mới đang trên đường tới. Chỉ những thế giới đã hoàn thiện mới chơi được.",
       "all": "Tất cả",
       "filter": "Lọc thế giới theo loại"
+    }
+  },
+  "academy": {
+    "instructor": "Hiệu trưởng Học viện",
+    "visit": "Đưa tôi đến Học viện",
+    "toVillage": "Về làng",
+    "tier": {
+      "1": "Tập sự",
+      "2": "Học giả",
+      "3": "Bậc thầy"
+    },
+    "boards": "Bàn Pha lê Trí nhớ",
+    "grid": "Lưới {{cols}} × {{rows}}",
+    "start": "Bắt đầu",
+    "locked": "Hoàn thành bàn {{tier}} để mở khóa",
+    "practiceToday": "Đã nhận thưởng hôm nay. Chơi để luyện tập và đạt điểm cao hơn!",
+    "best": "Cao nhất {{score}}",
+    "cleared_one": "hoàn thành {{count}} lần",
+    "cleared_other": "hoàn thành {{count}} lần",
+    "keys": "Bàn phím: phím mũi tên để di chuyển, Enter để lật, R để chơi lại, Esc để rời bàn. Trên màn hình cảm ứng, chạm vào thẻ.",
+    "badges": "Huy hiệu",
+    "badgeEarned": "Đã nhận",
+    "badgeLocked": "Chưa nhận",
+    "badgeUnlocked": "Huy hiệu vừa mở",
+    "recent": "Kết quả gần đây",
+    "noRecent": "Chưa có kết quả. Bàn đầu tiên đang chờ bạn!",
+    "col": {
+      "board": "Bàn",
+      "result": "Hoàn thành",
+      "score": "Điểm",
+      "moves": "Lượt",
+      "time": "Thời gian"
+    },
+    "restart": "Chơi lại",
+    "exit": "Rời bàn",
+    "backToHall": "Về đại sảnh",
+    "newBest": "Kỷ lục cá nhân mới!",
+    "guestNote": "Tiến trình khách chỉ lưu trên thiết bị này.",
+    "ask": {
+      "howto": "Chơi thế nào?",
+      "level": "Mình nên thử bàn nào?",
+      "scoring": "Tính điểm ra sao?",
+      "tip": "Cho mình một mẹo",
+      "badges": "Huy hiệu là gì?"
+    },
+    "owl": {
+      "welcome": "Hu hu, {{name}}! Chào mừng đến Học viện. Mỗi viên pha lê ở đây đều có một viên sinh đôi trốn trên bàn.",
+      "welcomeBack": "Chào mừng trở lại, {{name}}! Sẵn sàng luyện trí nhớ tuyệt vời chưa?",
+      "howto": "Mỗi lần lật hai thẻ. Nếu pha lê giống nhau, chúng sẽ mở luôn. Hãy mở hết bàn với ít lượt nhất có thể.",
+      "recommend": "Tiếp theo, thầy gợi ý bàn {{tier}}: tìm {{pairs}} cặp.",
+      "scoring": "Điểm bắt đầu cao và giảm một chút sau mỗi lượt thừa và mỗi giây. Bàn hoàn hảo chỉ dùng một lượt cho mỗi cặp!",
+      "tip1": "Đọc to màu của pha lê khi lật. Nghe thấy sẽ giúp con nhớ.",
+      "tip2": "Đi theo từng hàng để luôn biết chỗ nào đã xem rồi.",
+      "tip3": "Chậm mà chắc. Vội vàng thường tốn thêm lượt.",
+      "tip4": "Trước khi lật thẻ thứ hai, hãy hình dung viên sinh đôi ở đâu.",
+      "badges": "Mỗi huy hiệu chỉ nhận một lần và tặng thêm XP và pha lê. Có {{count}} huy hiệu để sưu tầm!",
+      "won": "Tuyệt vời! {{score}} điểm ở bàn {{tier}}.",
+      "practice": "Bàn đó hôm nay đã nhận thưởng rồi, nên lần này là luyện tập. Điểm vẫn được ghi lại!",
+      "lost": "Lần này chưa mở hết bàn. Mỗi lần thử đều giúp trí nhớ mạnh hơn. Chơi lại nhé?",
+      "tooFast": "Hu! Nhanh hơn cả cú lật. Mình chơi với tốc độ công bằng nhé."
     }
   }
 }

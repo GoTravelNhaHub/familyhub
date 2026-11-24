@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import Phaser from "phaser";
 import type { GameBridge } from "./bridge";
+import type { MemorySession } from "./types";
 import { VillageScene } from "./scenes/VillageScene";
 import { MemoryScene } from "./scenes/MemoryScene";
 
@@ -10,7 +11,7 @@ import { MemoryScene } from "./scenes/MemoryScene";
  * changes never leak canvases, loops, or listeners. Renders at device pixel
  * ratio (capped at 2) and lets CSS size the canvas via `zoom: 1 / dpr`.
  */
-export function GameCanvas({ bridge }: { bridge: GameBridge }) {
+export function GameCanvas({ bridge, memory }: { bridge: GameBridge; memory?: MemorySession }) {
   const ref = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
   const tRef = useRef(t);
@@ -45,8 +46,12 @@ export function GameCanvas({ bridge }: { bridge: GameBridge }) {
           g.registry.set("reducedMotion", reducedMotion);
           g.registry.set("touch", window.matchMedia?.("(pointer: coarse)").matches ?? false);
         },
+        // Board-only mode (Learning Academy): no village, start straight on the dealt deck.
+        postBoot: (g) => {
+          if (memory) g.scene.add("memory", MemoryScene, true, { session: memory });
+        },
       },
-      scene: [VillageScene, MemoryScene],
+      scene: memory ? [] : [VillageScene, MemoryScene],
     });
 
     const ro = new ResizeObserver(() => {
@@ -59,7 +64,7 @@ export function GameCanvas({ bridge }: { bridge: GameBridge }) {
       ro.disconnect();
       game.destroy(true);
     };
-  }, [bridge]);
+  }, [bridge, memory]);
 
   return <div ref={ref} className="game-canvas" />;
 }

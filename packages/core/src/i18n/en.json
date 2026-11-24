@@ -436,6 +436,34 @@
       "talkTouch": "Follow the golden light to the Village Guide, then tap them.",
       "quests": "Open Quests anytime to see what to do next.",
       "skip": "Skip"
+    },
+    "achievement": {
+      "academy": {
+        "first_crystal": {
+          "title": "First Crystal",
+          "desc": "Clear any Memory Crystal board."
+        },
+        "scholar": {
+          "title": "Scholar",
+          "desc": "Clear the Scholar board."
+        },
+        "master": {
+          "title": "Master Mind",
+          "desc": "Clear the Master board."
+        },
+        "flawless": {
+          "title": "Flawless",
+          "desc": "Clear a board using one move per pair."
+        },
+        "quick": {
+          "title": "Quick Thinker",
+          "desc": "Clear a board in under 4 seconds per pair."
+        },
+        "dedicated": {
+          "title": "Dedicated Learner",
+          "desc": "Clear boards on three different days."
+        }
+      }
     }
   },
   "platform": {
@@ -457,7 +485,7 @@
       },
       "learning-academy": {
         "title": "Learning Academy",
-        "desc": "Brain games for curious minds: numbers, words, and memory challenges."
+        "desc": "Professor Owl's Memory Crystal challenges: three difficulty levels, scores, and badges to earn."
       },
       "adventure-forest": {
         "title": "Adventure Forest",
@@ -518,6 +546,66 @@
       "sub": "New worlds are on the way. Only finished worlds can be played.",
       "all": "All",
       "filter": "Filter worlds by type"
+    }
+  },
+  "academy": {
+    "instructor": "Head of the Learning Academy",
+    "visit": "Take me to the Learning Academy",
+    "toVillage": "Visit the village",
+    "tier": {
+      "1": "Apprentice",
+      "2": "Scholar",
+      "3": "Master"
+    },
+    "boards": "Memory Crystal boards",
+    "grid": "{{cols}} × {{rows}} grid",
+    "start": "Start",
+    "locked": "Clear the {{tier}} board to unlock",
+    "practiceToday": "Today's reward earned. Play for practice and a better score!",
+    "best": "Best {{score}}",
+    "cleared_one": "cleared {{count}} time",
+    "cleared_other": "cleared {{count}} times",
+    "keys": "Keyboard: arrow keys move, Enter flips, R restarts, Esc leaves the board. Tap or click cards on touch screens.",
+    "badges": "Badges",
+    "badgeEarned": "Earned",
+    "badgeLocked": "Not earned yet",
+    "badgeUnlocked": "Badges unlocked",
+    "recent": "Recent results",
+    "noRecent": "No results yet. Your first board is waiting!",
+    "col": {
+      "board": "Board",
+      "result": "Cleared",
+      "score": "Score",
+      "moves": "Moves",
+      "time": "Time"
+    },
+    "restart": "Restart",
+    "exit": "Leave board",
+    "backToHall": "Back to the hall",
+    "newBest": "New personal best!",
+    "guestNote": "Guest progress stays on this device.",
+    "ask": {
+      "howto": "How do I play?",
+      "level": "Which board should I try?",
+      "scoring": "How does scoring work?",
+      "tip": "Give me a tip",
+      "badges": "What are badges?"
+    },
+    "owl": {
+      "welcome": "Hoo-hoo, {{name}}! Welcome to the Learning Academy. Every crystal here has a twin hiding on the board.",
+      "welcomeBack": "Welcome back, {{name}}! Ready to train that wonderful memory?",
+      "howto": "Flip two cards at a time. If the crystals match, they stay open. Clear the whole board in as few moves as you can.",
+      "recommend": "I suggest the {{tier}} board next: {{pairs}} pairs to find.",
+      "scoring": "Your score starts high and drops a little for every extra move and every second. A perfect board uses just one move per pair!",
+      "tip1": "Say each crystal's color out loud as you flip it. Hearing it helps you remember.",
+      "tip2": "Work row by row, so you always know where you have already looked.",
+      "tip3": "Slow and steady wins. Rushing usually costs extra moves.",
+      "tip4": "Before flipping the second card, picture where you saw its twin.",
+      "badges": "Badges are earned once and give bonus XP and crystals. There are {{count}} to collect!",
+      "won": "Splendid! {{score}} points on the {{tier}} board.",
+      "practice": "You already earned today's reward for that board, so that one was practice. Your score still counts!",
+      "lost": "Not quite cleared that time. Every try makes your memory stronger. Shall we go again?",
+      "tooFast": "Hoo! That was faster than any owl can flip. Let's play it at a fair pace."
     }
   }
 }

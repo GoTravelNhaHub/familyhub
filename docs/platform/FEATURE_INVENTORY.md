@@ -16,7 +16,7 @@ Legend: **Verified** = exercised end to end in this audit (browser against local
 | Calendar events with attendees | Unverified | `events` module, `pages/Events.tsx` |
 | Family dashboard | Verified (renders, empty family) | `/family` in browser |
 | Parent approval of task completion | Missing | Any member can mark a task done (documented in `docs/ADVENTURE_GAME.md`) |
-| Achievements (family features) | Missing | No model or endpoint |
+| Achievements (family features) | Missing | Game badges exist (Learning Academy); no family/task achievements |
 | Mobile app (Expo) | Unverified | `apps/mobile/src/screens/*`; no game |
 | i18n en / zh / vi | Verified (en in browser) | `packages/core/src/i18n` |
 
@@ -37,6 +37,8 @@ Legend: **Verified** = exercised end to end in this audit (browser against local
 | Adventure Forest content | Missing | Gate unlocks at level 3; no content |
 | Guest → account progress migration | Missing | Documented limitation |
 | Leaderboards | Missing | — |
+| Learning Academy world (`/academy`) | Verified | Guest: played and won Apprentice in browser (score, reward, badge, persistence after reload, R restart, Esc exit, phone layout). Member: API script — perfect win, replayed session rejected, practice run (no re-grant), forged flips, too-fast, other family 403 |
+| Academy badges (6) | Verified | Server grants `achievement:<key>` ledger rows in the finish transaction; `apps/api/src/game/achievements.ts` + parity test with the guest copy in core |
 
 ## Platform (Release 1)
 

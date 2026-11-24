@@ -4,6 +4,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { requireParent, resolveFamilyScope } from "../auth/family-scope";
 import type { AuthContext } from "../auth/jwt.strategy";
 import { readAvatar, type AvatarConfig } from "./avatar";
+import { ACHIEVEMENTS, achievementSourceKey, newlyUnlocked, type AchievementReward } from "./achievements";
 import {
   dateInTz,
   FAMILY_LEVEL_SCALE,
@@ -32,6 +33,12 @@ import {
   MIN_MS_PER_PAIR,
   replayFlips,
 } from "./memory";
+
+const ACHIEVEMENT_PREFIX = "achievement:";
+/** Finished runs (won or not) listed as recent results in the Academy. */
+const RECENT_RESULTS = 8;
+
+type Tx = Prisma.TransactionClient;
 
 const DAILY_CHEST_REWARD: Resources = { xp: 5, coins: 10, crystals: 0, materials: 2 };
 
@@ -161,6 +168,18 @@ export class GameService {
         select: { level: true, score: true },
       }),
     ]);
+    const [recent, unlocked] = await Promise.all([
+      this.prisma.miniGameSession.findMany({
+        where: { memberId: member.id, game: "memory", finishedAt: { not: null } },
+        orderBy: { finishedAt: "desc" },
+        take: RECENT_RESULTS,
+        select: { level: true, won: true, score: true, moves: true, durationMs: true, finishedAt: true },
+      }),
+      this.prisma.gameLedgerEntry.findMany({
+        where: { memberId: member.id, sourceKey: { startsWith: ACHIEVEMENT_PREFIX } },
+        select: { sourceKey: true, createdAt: true },
+      }),
+    ]);
 
     const avatarOf = (m: Member) =>
       readAvatar(profiles.find((p) => p.memberId === m.id)?.avatar, m.id, m.role);
@@ -221,9 +240,22 @@ export class GameService {
           unlocked: l.level <= maxWon + 1,
           rewardedToday: rewardedToday.some((r) => r.sourceKey === memorySourceKey(l.level, ctx.today)),
           best: sessions.filter((s) => s.level === l.level).reduce((acc, s) => Math.max(acc, s.score ?? 0), 0),
+          wins: sessions.filter((s) => s.level === l.level).length,
           reward: memoryReward(l),
         })),
+        recent: recent.map((r) => ({
+          level: r.level,
+          won: r.won,
+          score: r.score ?? 0,
+          moves: r.moves ?? 0,
+          durationMs: r.durationMs ?? 0,
+          finishedAt: r.finishedAt!.toISOString(),
+        })),
       },
+      achievements: ACHIEVEMENTS.map((a) => {
+        const row = unlocked.find((u) => u.sourceKey === achievementSourceKey(a.key));
+        return { key: a.key, reward: a.reward, unlocked: !!row, unlockedAt: row?.createdAt.toISOString() ?? null };
+      }),
     };
   }
 
@@ -353,31 +385,67 @@ export class GameService {
     const won = replay.won && !error;
     const score = won ? memoryScore(cfg, replay.moves, durationMs) : 0;
 
-    const closed = await this.prisma.miniGameSession.updateMany({
-      where: { id: session.id, finishedAt: null },
-      data: { finishedAt: now, won, moves: replay.moves, score, durationMs },
-    });
-    if (closed.count !== 1) throw new BadRequestException("session_finished");
+    const family = await this.prisma.family.findUniqueOrThrow({ where: { id: member.familyId } });
 
-    let reward: Resources | null = null;
-    if (won) {
-      const today = await this.today(member.familyId);
-      const grant = memoryReward(cfg);
-      try {
-        await this.prisma.gameLedgerEntry.create({
-          data: {
-            familyId: member.familyId,
-            memberId: member.id,
-            sourceKey: memorySourceKey(cfg.level, today),
-            ...grant,
-          },
+    // Close the session, grant the daily level reward, and grant any newly
+    // earned achievements in one transaction. Every grant is a unique ledger
+    // row, so replays and concurrent requests cannot pay out twice.
+    return this.prisma.$transaction(async (tx) => {
+      const closed = await tx.miniGameSession.updateMany({
+        where: { id: session.id, finishedAt: null },
+        data: { finishedAt: now, won, moves: replay.moves, score, durationMs },
+      });
+      if (closed.count !== 1) throw new BadRequestException("session_finished");
+
+      let reward: Resources | null = null;
+      let achievements: { key: string; reward: AchievementReward }[] = [];
+      if (won) {
+        const grant = memoryReward(cfg);
+        const today = dateInTz(now, family.timezone);
+        const created = await tx.gameLedgerEntry.createMany({
+          data: [{ familyId: member.familyId, memberId: member.id, sourceKey: memorySourceKey(cfg.level, today), ...grant }],
+          // Already rewarded for this level today: the result still counts as practice.
+          skipDuplicates: true,
         });
-        reward = grant;
-      } catch (e) {
-        // Already rewarded for this level today: the result still counts as practice.
-        if (!isUniqueViolation(e)) throw e;
+        if (created.count === 1) reward = grant;
+        achievements = await this.grantAchievements(tx, member, family.timezone);
       }
-    }
-    return { won, moves: replay.moves, score, durationMs, reward, error: error ?? null };
+      return { won, moves: replay.moves, score, durationMs, reward, achievements, error: error ?? null };
+    });
+  }
+
+  /** Re-evaluates achievements from all recorded wins and grants the missing ones. */
+  private async grantAchievements(tx: Tx, member: Member, timezone: string) {
+    const [wins, granted] = await Promise.all([
+      tx.miniGameSession.findMany({
+        where: { memberId: member.id, game: "memory", won: true, finishedAt: { not: null } },
+        select: { level: true, moves: true, durationMs: true, finishedAt: true },
+      }),
+      tx.gameLedgerEntry.findMany({
+        where: { memberId: member.id, sourceKey: { startsWith: ACHIEVEMENT_PREFIX } },
+        select: { sourceKey: true },
+      }),
+    ]);
+    const fresh = newlyUnlocked(
+      wins.map((w) => ({
+        level: w.level,
+        pairs: memoryLevel(w.level)?.pairs ?? 0,
+        moves: w.moves ?? Number.MAX_SAFE_INTEGER,
+        durationMs: w.durationMs ?? Number.MAX_SAFE_INTEGER,
+        day: dateInTz(w.finishedAt!, timezone),
+      })),
+      granted.map((g) => g.sourceKey.slice(ACHIEVEMENT_PREFIX.length)),
+    );
+    if (fresh.length === 0) return [];
+    await tx.gameLedgerEntry.createMany({
+      data: fresh.map((a) => ({
+        familyId: member.familyId,
+        memberId: member.id,
+        sourceKey: achievementSourceKey(a.key),
+        ...a.reward,
+      })),
+      skipDuplicates: true,
+    });
+    return fresh.map((a) => ({ key: a.key, reward: a.reward }));
   }
 }

@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { ApiError, auth } from "../lib/api";
-import { useMe } from "../hooks/useAuth";
+import { ApiError } from "../lib/api";
 import { GameBridge, type InteractableId, type WorldSnapshot } from "../game/bridge";
 import { GameCanvas } from "../game/GameCanvas";
-import { gameApi, gameKeys, serverBackend, type GameBackend } from "../game/gameApi";
+import { serverBackend, type GameBackend } from "../game/gameApi";
 import type { GameState, MemoryResult, Quest, Resources } from "../game/types";
 import { GUIDE_LOOK, type AvatarConfig } from "../game/avatar";
 import { AvatarEditor, AvatarPortrait } from "../game/ui/AvatarEditor";
@@ -16,9 +15,9 @@ import { ChestIcon, GateIcon, MapIcon, OwlIcon, RewardChips, ScrollIcon, ShirtIc
 import { Coach, Minimap, MenuButton, PlayerCard, QuestTracker, pickObjective, type CoachStep } from "../game/ui/Hud";
 import { SPAWN } from "../game/world";
 import { markPlayed } from "../platform/recent";
+import { PlayerGate } from "../game/PlayerGate";
 import "../game/game.css";
 
-const PLAYER_KEY = "fh.game.playerId";
 const COACH_KEY = "fh.game.coach";
 const MAP_KEY = "fh.game.mapHidden";
 const FLOAT_COLOR: Record<keyof Resources, string> = { xp: "#86efac", coins: "#fde047", crystals: "#d8b4fe", materials: "#fdba74" };
@@ -51,66 +50,12 @@ type PanelState =
   | { kind: "memoryResult"; level: number; result: MemoryResult };
 
 export default function PlayPage() {
-  const { t } = useTranslation();
-  const me = useMe();
-  const familyId = auth.getFamilyId();
-  const membership = me.data?.memberships.find((m) => m.familyId === familyId) ?? me.data?.memberships[0];
-  const [playerId, setPlayerId] = useState<string | null>(() => readLocal(PLAYER_KEY));
-  const state = useQuery({
-    queryKey: gameKeys.state(membership?.memberId ?? "self"),
-    queryFn: () => gameApi.state(membership!.memberId),
-    enabled: !!membership,
-  });
-
-  if (me.isLoading || !membership || state.isLoading) {
-    return <div className="play-root play-loading"><div className="g-loader" />{t("game.ui.loading")}</div>;
-  }
-  if (state.isError || !state.data) {
-    return <div className="play-root play-loading">{t("game.ui.loadError")}</div>;
-  }
-
-  const family = state.data.family.members;
-  const isParent = membership.role === "parent";
-  // Kids play as themselves; grown-ups pick who is holding the device.
-  const chosen =
-    !isParent || family.length <= 1 ? membership.memberId : family.find((m) => m.memberId === playerId)?.memberId;
-
-  if (!chosen) {
-    return (
-      <div className="play-root play-picker">
-        <h1>{t("game.picker.title")}</h1>
-        <p className="muted">{t("game.picker.subtitle")}</p>
-        <div className="g-picker-grid">
-          {family.map((m) => (
-            <button
-              key={m.memberId}
-              type="button"
-              className="g-picker-card"
-              onClick={() => {
-                writeLocal(PLAYER_KEY, m.memberId);
-                setPlayerId(m.memberId);
-              }}
-            >
-              <AvatarPortrait avatar={m.avatar} size={72} />
-              <strong>{m.name}</strong>
-              <span className="muted small">{t("game.ui.level", { level: m.level })}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <GameSession
-      key={chosen}
-      backend={serverBackend(chosen)}
-      canSwitch={isParent && family.length > 1}
-      onSwitch={() => {
-        writeLocal(PLAYER_KEY, null);
-        setPlayerId(null);
-      }}
-    />
+    <PlayerGate>
+      {({ memberId, canSwitch, onSwitch }) => (
+        <GameSession key={memberId} backend={serverBackend(memberId)} canSwitch={canSwitch} onSwitch={onSwitch} />
+      )}
+    </PlayerGate>
   );
 }
 
@@ -269,6 +214,7 @@ export function GameSession({
     onSuccess: (result, vars) => {
       setPanel({ kind: "memoryResult", level: vars.level, result });
       if (result.reward) reward(result.reward, t("game.memory.title"));
+      for (const a of result.achievements ?? []) reward(a.reward, t(`game.achievement.${a.key}.title`));
       refresh();
     },
     onError: (e) => {
@@ -454,6 +400,7 @@ function PanelView(props: {
   const { t } = useTranslation();
   const label = useResourceLabel();
   const { panel, state, busy, onClose } = props;
+  const navigate = useNavigate();
   const name = state.player.name;
   const [topic, setTopic] = useState<string | null>(null);
 
@@ -482,6 +429,7 @@ function PanelView(props: {
             ]
           : [
               { label: t("game.npc.owl.play"), onSelect: () => props.setPanel({ kind: "memoryIntro" }) },
+              { label: t("academy.visit"), onSelect: () => navigate("/academy") },
               { label: t("game.npc.owl.askCrystals"), onSelect: () => setTopic("crystals") },
               { label: t("game.ui.bye"), onSelect: onClose },
             ];

@@ -67,17 +67,17 @@ export const WORLDS: WorldDefinition[] = parseWorldCatalog([
     supportedDevices: ["desktop", "tablet", "mobile"],
   },
   {
+    // Hall is React; boards reuse the village's Phaser MemoryScene (lazy).
     id: "learning-academy",
     slug: "learning-academy",
     category: "learning",
-    engine: "react",
-    status: "coming_soon",
-    version: "0.1.0",
-    entryRoute: null,
+    engine: "phaser",
+    status: "available",
+    version: "1.0.0",
+    entryRoute: "/academy",
     thumbnail: "academy",
     guestAccessible: true,
     supportedDevices: ["desktop", "tablet", "mobile"],
-    prerequisites: ["family-adventure"],
   },
   {
     id: "adventure-forest",

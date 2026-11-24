@@ -6,3 +6,4 @@ export * from "./rewards";
 export * from "./i18n";
 export * from "./worlds";
 export * from "./redirect";
+export * from "./achievements";

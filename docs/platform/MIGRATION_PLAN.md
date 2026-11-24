@@ -34,6 +34,15 @@ No API or database changes in Release 1.
 
 Behavior change to communicate: signed-in users land on the game lobby; the dashboard is one tap away under **Family**.
 
+## Learning Academy (implemented, not deployed)
+
+- World registry: `learning-academy` is `available` at `/academy` (guest and member).
+- Hall (React): Professor Owl instructor with topics, tips, level suggestion, and reactions to the last run; three difficulty boards (Apprentice / Scholar / Master = 6 / 8 / 10 pairs); badges; recent results.
+- Boards reuse the village `MemoryScene` in board-only mode (`GameCanvas memory={session}`), lazy-loaded, remounted per session (restart = new server session).
+- Server: `finishMemory` now closes the session, grants the daily level reward, and grants badges in one transaction (`createMany … skipDuplicates`). `GET /game/state` adds `achievements` and `memory.recent`, and `memory.levels[].wins`. Additive JSON only; no migration.
+- Deploy order: API first (Render, no migration), then web. The web tolerates an older API (missing badges/recent default to empty).
+- Guests: same rules from `@family-hub/core` in `guest.ts`. The API cannot import core at runtime (core ships TS source), so it keeps its own copy with a parity test.
+
 ## Release 2 — Identity and progression (next)
 - `/profile` from existing `Member` + `GameProfile` (no new identity tables).
 - Achievements: definitions in core; unlocks written to `game_ledger`-style table with unique keys.
