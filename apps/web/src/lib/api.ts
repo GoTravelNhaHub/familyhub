@@ -129,6 +129,8 @@ export const api = {
     request<T>(path, { method: "POST", body, query }),
   patch: <T>(path: string, body?: unknown, query?: Record<string, string | undefined>) =>
     request<T>(path, { method: "PATCH", body, query }),
+  put: <T>(path: string, body?: unknown, query?: Record<string, string | undefined>) =>
+    request<T>(path, { method: "PUT", body, query }),
   delete: <T>(path: string, query?: Record<string, string | undefined>) =>
     request<T>(path, { method: "DELETE", query }),
 };

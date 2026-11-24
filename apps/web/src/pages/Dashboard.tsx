@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { api } from "../lib/api";
 import type { Member, StarBalance, Task, TaskCompletion } from "../lib/types";
 
@@ -37,6 +38,15 @@ export function Dashboard() {
     <>
       <h1>{t("dashboard.greeting")}</h1>
       <p className="muted" style={{ fontSize: 16, marginTop: -8 }}>{t("dashboard.subGreeting")}</p>
+
+      <Link to="/play" className="card adventure-cta">
+        <span className="adventure-cta-art" aria-hidden>🗺️</span>
+        <span>
+          <strong>{t("dashboard.adventureTitle")}</strong>
+          <span className="muted">{t("dashboard.adventureText")}</span>
+        </span>
+        <span className="adventure-cta-go">{t("dashboard.adventureGo")}</span>
+      </Link>
 
       {kids.length === 0 && (
         <div className="card">

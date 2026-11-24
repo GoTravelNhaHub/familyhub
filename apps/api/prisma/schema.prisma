@@ -81,6 +81,10 @@ model Family {
   starAdjustments  StarAdjustment[]
   events           Event[]
   eventAttendees   EventAttendee[]
+  gameProfiles     GameProfile[]
+  gameQuests       GameQuestProgress[]
+  gameLedger       GameLedgerEntry[]
+  miniGameSessions MiniGameSession[]
 
   @@map("families")
 }
@@ -106,6 +110,10 @@ model Member {
   starAdjustments       StarAdjustment[] @relation("AdjustmentMember")
   starAdjustmentsByMe   StarAdjustment[] @relation("AdjustmentCreatedBy")
   eventAttendees        EventAttendee[]
+  gameProfile           GameProfile?
+  gameQuests            GameQuestProgress[]
+  gameLedger            GameLedgerEntry[]
+  miniGameSessions      MiniGameSession[]
 
   @@unique([familyId, userId])
   @@index([userId])
@@ -241,4 +249,88 @@ model EventAttendee {
 
   @@id([eventId, memberId])
   @@map("event_attendees")
+}
+
+// --- Adventure game -------------------------------------------------------
+// Resources (xp, coins, crystals, materials) are never stored as a balance:
+// they are summed from game_ledger, whose (member_id, source_key) uniqueness
+// makes every reward grant idempotent.
+
+enum GameQuestStatus {
+  active
+  rewarded
+  cancelled
+}
+
+model GameProfile {
+  memberId  String   @id @map("member_id") @db.Uuid
+  familyId  String   @map("family_id") @db.Uuid
+  avatar    Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([familyId])
+  @@map("game_profiles")
+}
+
+model GameQuestProgress {
+  id         String          @id @default(uuid()) @db.Uuid
+  familyId   String          @map("family_id") @db.Uuid
+  memberId   String          @map("member_id") @db.Uuid
+  questKey   String          @map("quest_key")
+  periodKey  String          @map("period_key")
+  status     GameQuestStatus @default(active)
+  acceptedAt DateTime        @default(now()) @map("accepted_at") @db.Timestamptz
+  rewardedAt DateTime?       @map("rewarded_at") @db.Timestamptz
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, questKey, periodKey])
+  @@index([familyId])
+  @@map("game_quest_progress")
+}
+
+model GameLedgerEntry {
+  id        String   @id @default(uuid()) @db.Uuid
+  familyId  String   @map("family_id") @db.Uuid
+  memberId  String   @map("member_id") @db.Uuid
+  sourceKey String   @map("source_key")
+  xp        Int      @default(0)
+  coins     Int      @default(0)
+  crystals  Int      @default(0)
+  materials Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, sourceKey])
+  @@index([familyId])
+  @@map("game_ledger")
+}
+
+model MiniGameSession {
+  id         String    @id @default(uuid()) @db.Uuid
+  familyId   String    @map("family_id") @db.Uuid
+  memberId   String    @map("member_id") @db.Uuid
+  game       String
+  level      Int
+  deck       Int[]     @db.SmallInt
+  startedAt  DateTime  @default(now()) @map("started_at") @db.Timestamptz
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz
+  won        Boolean   @default(false)
+  moves      Int?
+  score      Int?
+  durationMs Int?      @map("duration_ms")
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId, game, startedAt])
+  @@index([familyId])
+  @@map("minigame_sessions")
 }

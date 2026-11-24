@@ -22,7 +22,8 @@
     "rewards": "奖励",
     "requests": "申请",
     "family": "家庭",
-    "calendar": "日历"
+    "calendar": "日历",
+    "play": "冒险"
   },
   "landing": {
     "navLogin": "登录",
@@ -68,7 +69,8 @@
     "finalCtaTitle": "试一试 — 您的早晨会感谢您。",
     "finalCtaText": "免费开始。大约 2 分钟设置完成。适用于家里现有的任何设备。",
     "finalCtaBtn": "🚀 开始您的家庭",
-    "footer": "© {{year}} · 为家庭打造"
+    "footer": "© {{year}} · 为家庭打造",
+    "ctaGuest": "🎮 游客试玩"
   },
   "auth": {
     "loginTitle": "欢迎回来!",
@@ -113,7 +115,10 @@
     "tasksToday_other": "今天 {{count}} 个任务",
     "doneRatio": "完成 {{done}} / {{total}}",
     "allDone": "全部完成!🎉",
-    "grownUps": "家长们"
+    "grownUps": "家长们",
+    "adventureTitle": "家庭冒险世界",
+    "adventureText": "探索村庄，把真实任务变成冒险任务，还能玩小游戏。",
+    "adventureGo": "开始 ▸"
   },
   "tasks": {
     "title": "✅ 今日任务",
@@ -185,5 +190,224 @@
     "ends": "结束时间",
     "submit": "➕ 添加",
     "deleteConfirm": "删除此事件?"
+  },
+  "game": {
+    "place": {
+      "academy": "学习学院",
+      "board": "任务板",
+      "forest": "冒险森林",
+      "house": "{{name}}的家"
+    },
+    "npc": {
+      "guide": {
+        "name": "村庄向导",
+        "hello1": "你好，{{name}}！欢迎来到你们家的村庄。",
+        "hello2": "你在现实生活中做的每件事都会让村庄成长。刷牙、阅读、整理房间——每一件都是一个任务！",
+        "hello3": "接受我的第一个任务，我就带你四处看看。",
+        "back": "欢迎回来，{{name}}！今天任务板上有 {{count}} 个家庭任务。",
+        "askVillage": "给我讲讲这个村庄",
+        "askQuests": "任务是怎么运作的？",
+        "openBoard": "带我去看任务板",
+        "topic": {
+          "village": "北边是学习学院，猫头鹰教授在那里出谜题。每位家庭成员在这里都有一座房子。过了河往东是冒险森林，到 3 级时就会打开。",
+          "quests": "先接受任务，然后完成现实中的事情。标记完成后，回来领取奖励。每个任务只能领取一次。"
+        }
+      },
+      "owl": {
+        "name": "猫头鹰教授",
+        "hello": "咕咕！你好，{{name}}。我的记忆水晶被打乱了，你能找出相同的一对吗？",
+        "back": "咕！又来练习了吗，{{name}}？每玩一次，头脑就更灵活。",
+        "play": "玩记忆水晶挑战",
+        "askCrystals": "知识水晶是什么？",
+        "topic": {
+          "crystals": "知识水晶来自学习：这里的谜题，以及阅读或作业任务。把它们存起来，图书馆以后会用到！"
+        }
+      },
+      "guardian": {
+        "name": "森林守护者",
+        "locked": "停下，小探险家！冒险森林在 {{level}} 级时开放。你现在是 {{current}} 级，继续加油！",
+        "open": "大门为你打开了，{{name}}。去森林小路走走吧，记得别离开小路！"
+      }
+    },
+    "quest": {
+      "welcome": {
+        "title": "热情欢迎",
+        "desc": "认识村庄向导，了解村庄的运作方式。"
+      },
+      "academy": {
+        "title": "散落的水晶",
+        "desc": "完成一局记忆水晶挑战，帮助猫头鹰教授。"
+      },
+      "dailyMemory": {
+        "title": "每日脑力训练",
+        "desc": "今天完成一局记忆水晶挑战。"
+      },
+      "realTask": "现实任务",
+      "lockedHint": "请先完成之前的故事任务。"
+    },
+    "theme": {
+      "library": {
+        "title": "古老的知识之书",
+        "desc": "图书管理员需要你帮忙修复古书。完成“{{task}}”，找回一页丢失的书页。"
+      },
+      "spring": {
+        "title": "闪光泉",
+        "desc": "大家都干干净净，村里的泉水就会更闪亮。完成“{{task}}”让它发光吧。"
+      },
+      "builder": {
+        "title": "给建筑大师的材料",
+        "desc": "家里整洁就能得到更多建筑材料。完成“{{task}}”为村庄收集砖块。"
+      },
+      "garden": {
+        "title": "村庄花园",
+        "desc": "健康的探险家种出健康的花园。完成“{{task}}”让花园开满花。"
+      },
+      "animals": {
+        "title": "森林的朋友",
+        "desc": "小动物们需要善良的帮手。完成“{{task}}”赢得它们的信任。"
+      },
+      "expedition": {
+        "title": "准备出发",
+        "desc": "每一次伟大的冒险都从准备开始。完成“{{task}}”做好准备。"
+      },
+      "helper": {
+        "title": "村庄小帮手",
+        "desc": "大家一起出力，村庄就会兴旺。完成“{{task}}”来帮忙吧。"
+      }
+    },
+    "status": {
+      "locked": "未解锁",
+      "available": "新任务",
+      "active": "进行中",
+      "completed": "可领取",
+      "rewarded": "已完成"
+    },
+    "action": {
+      "accept": "接受任务",
+      "markDone": "我完成了！",
+      "play": "去玩",
+      "claim": "领取奖励",
+      "cancel": "放弃"
+    },
+    "board": {
+      "intro": "每天，家里的真实任务都会出现在这里。",
+      "activity": "家庭任务",
+      "story": "故事",
+      "daily": "每日",
+      "noTasks": "今天没有任务。大人可以在任务页面添加。",
+      "empty": "暂时没有。"
+    },
+    "resource": {
+      "xp": "经验",
+      "coins": "冒险金币",
+      "crystals": "知识水晶",
+      "materials": "建筑材料"
+    },
+    "ui": {
+      "close": "关闭",
+      "level": "{{level}} 级",
+      "loading": "正在打开村庄大门…",
+      "loadError": "村庄加载失败，请重试。",
+      "avatar": "形象",
+      "quests": "任务",
+      "switchPlayer": "切换玩家",
+      "dashboard": "家长视图",
+      "familyLevel": "家庭 {{level}} 级",
+      "hintKeys": "用方向键或 WASD 移动，靠近后按 E 交谈。",
+      "hintTouch": "点击任意位置走过去，点击角色可交谈。",
+      "gotIt": "知道了",
+      "bye": "再见！",
+      "back": "返回"
+    },
+    "picker": {
+      "title": "谁在玩？",
+      "subtitle": "选择正在使用设备的探险家。"
+    },
+    "interact": {
+      "guide": "和村庄向导交谈",
+      "owl": "和猫头鹰教授交谈",
+      "board": "查看任务板",
+      "chest": "打开宝箱",
+      "academy": "进入学院",
+      "forestGate": "走近森林大门",
+      "house": "敲门"
+    },
+    "chest": {
+      "title": "每日宝藏",
+      "ready": "宝箱在发光，里面有东西等着你！",
+      "claimed": "今天的宝箱已经打开过了。明天会有新的，不着急！",
+      "open": "打开"
+    },
+    "house": {
+      "mine": "温馨的家。你可以随时在这里换装。",
+      "visit": "{{name}} 在门口向你挥手。"
+    },
+    "avatar": {
+      "title": "打扮你的探险家",
+      "skin": "肤色",
+      "hair": "发型",
+      "hairColor": "发色",
+      "outfit": "服装",
+      "accessory": "配饰",
+      "save": "保存形象",
+      "hairOptions": {
+        "short": "短发",
+        "long": "长发",
+        "spiky": "刺猬头",
+        "bun": "丸子头"
+      },
+      "accessoryOptions": {
+        "none": "无",
+        "cap": "帽子",
+        "bow": "蝴蝶结",
+        "crown": "皇冠",
+        "glasses": "眼镜"
+      }
+    },
+    "memory": {
+      "title": "记忆水晶挑战",
+      "levelTitle": "第 {{level}} 关",
+      "hud": "步数 {{moves}} · 配对 {{pairs}}/{{total}} · {{seconds}} 秒",
+      "intro": "咕！每颗水晶都有一个双胞胎。记住它们的位置，把它们全部配对。",
+      "step1": "点击卡片翻开。键盘：方向键移动，回车翻牌。",
+      "step2": "每次翻两张，如果相同就会保持翻开。",
+      "step3": "步数越少、时间越短，分数越高。",
+      "pairs": "{{count}} 对",
+      "practice": "今天已领奖励，练习模式",
+      "locked": "请先通过上一关",
+      "best": "最高：{{score}}",
+      "won": "所有水晶都修复了！",
+      "score": "得分 {{score}}",
+      "moves": "{{moves}} 步",
+      "time": "{{seconds}} 秒",
+      "rewardEarned": "你获得了",
+      "practiceDone": "练习得很好！这一关今天的奖励已经领过了。",
+      "tooFast": "哇，比猫头鹰眨眼还快！请用正常速度再试一次。",
+      "notCleared": "还没全部配对，再试一次吧！",
+      "backToVillage": "回到村庄",
+      "again": "再玩一次",
+      "next": "下一关",
+      "leave": "离开"
+    },
+    "error": {
+      "generic": "出了点问题，请重试。",
+      "already_claimed": "这个奖励已经领过了。",
+      "quest_not_completed": "先完成任务，再领取。",
+      "quest_locked": "这个任务还没解锁。",
+      "quest_active": "你已经接受了这个任务。",
+      "quest_completed": "这个任务可以领取了。",
+      "quest_rewarded": "这个任务已经完成。",
+      "quest_not_active": "这个任务不在进行中。",
+      "quest_not_found": "今天没有这个任务。",
+      "level_locked": "请先通过上一关。",
+      "session_finished": "这局游戏已经结束了。"
+    },
+    "guest": {
+      "name": "探险家",
+      "banner": "游客模式：进度只保存在这台设备上。",
+      "signUp": "免费注册",
+      "save": "注册以保存",
+      "boardHint": "创建免费家庭账户，就能把真实的家务和作业变成这里的任务。"
+    }
   }
 }

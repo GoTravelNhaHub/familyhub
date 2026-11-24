@@ -71,6 +71,7 @@ export function Landing() {
           <div className="row" style={{ gap: 14, marginTop: 22 }}>
             <Link to="/register"><button className="big">{t("landing.ctaStart")}</button></Link>
             <Link to="/login"><button className="ghost big">{t("landing.ctaHaveAccount")}</button></Link>
+            <Link to="/play"><button className="happy big">{t("landing.ctaGuest")}</button></Link>
           </div>
           <div className="muted" style={{ marginTop: 16 }}>{t("landing.finePrint")}</div>
         </div>

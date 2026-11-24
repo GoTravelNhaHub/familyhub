@@ -22,7 +22,8 @@
     "rewards": "Phần thưởng",
     "requests": "Yêu cầu",
     "family": "Gia đình",
-    "calendar": "Lịch"
+    "calendar": "Lịch",
+    "play": "Phiêu lưu"
   },
   "landing": {
     "navLogin": "Đăng nhập",
@@ -68,7 +69,8 @@
     "finalCtaTitle": "Hãy thử — buổi sáng của bạn sẽ cảm ơn bạn.",
     "finalCtaText": "Miễn phí để bắt đầu. Khoảng 2 phút để thiết lập. Hoạt động trên mọi thiết bị gia đình bạn đang có.",
     "finalCtaBtn": "🚀 Tạo gia đình của bạn",
-    "footer": "© {{year}} · Dành cho các gia đình"
+    "footer": "© {{year}} · Dành cho các gia đình",
+    "ctaGuest": "🎮 Chơi thử không cần tài khoản"
   },
   "auth": {
     "loginTitle": "Chào mừng trở lại!",
@@ -113,7 +115,10 @@
     "tasksToday_other": "{{count}} việc hôm nay",
     "doneRatio": "{{done}} / {{total}} xong",
     "allDone": "Xong hết rồi! 🎉",
-    "grownUps": "Người lớn"
+    "grownUps": "Người lớn",
+    "adventureTitle": "Thế giới phiêu lưu gia đình",
+    "adventureText": "Khám phá ngôi làng, nhận nhiệm vụ từ việc thật và chơi trò chơi nhỏ.",
+    "adventureGo": "Chơi ▸"
   },
   "tasks": {
     "title": "✅ Việc hôm nay",
@@ -185,5 +190,224 @@
     "ends": "Kết thúc",
     "submit": "➕ Thêm",
     "deleteConfirm": "Xoá sự kiện?"
+  },
+  "game": {
+    "place": {
+      "academy": "Học viện",
+      "board": "Bảng nhiệm vụ",
+      "forest": "Rừng phiêu lưu",
+      "house": "Nhà của {{name}}"
+    },
+    "npc": {
+      "guide": {
+        "name": "Hướng dẫn viên làng",
+        "hello1": "Chào {{name}}! Chào mừng đến ngôi làng của gia đình bạn.",
+        "hello2": "Mọi việc bạn làm ngoài đời đều giúp ngôi làng lớn lên. Đánh răng, đọc sách, dọn dẹp: mỗi việc là một nhiệm vụ!",
+        "hello3": "Nhận nhiệm vụ đầu tiên của tôi, tôi sẽ dẫn bạn đi tham quan.",
+        "back": "Chào mừng trở lại, {{name}}! Hôm nay có {{count}} nhiệm vụ gia đình trên bảng.",
+        "askVillage": "Kể cho tôi về ngôi làng",
+        "askQuests": "Nhiệm vụ hoạt động thế nào?",
+        "openBoard": "Cho tôi xem bảng nhiệm vụ",
+        "topic": {
+          "village": "Phía bắc là Học viện, nơi Giáo sư Cú ra câu đố. Mỗi thành viên có một ngôi nhà ở đây. Qua sông về phía đông là Rừng phiêu lưu, sẽ mở khi bạn đạt cấp 3.",
+          "quests": "Nhận nhiệm vụ, rồi làm việc thật. Khi đã đánh dấu xong, quay lại nhận thưởng. Mỗi nhiệm vụ chỉ nhận thưởng một lần."
+        }
+      },
+      "owl": {
+        "name": "Giáo sư Cú",
+        "hello": "Hú hú! Chào {{name}}. Những viên pha lê trí nhớ của ta bị xáo trộn. Con tìm được các cặp giống nhau không?",
+        "back": "Hú! Lại đến luyện tập à, {{name}}? Mỗi lần chơi, đầu óc lại nhanh nhạy hơn.",
+        "play": "Chơi Thử thách Pha lê trí nhớ",
+        "askCrystals": "Pha lê tri thức là gì?",
+        "topic": {
+          "crystals": "Pha lê tri thức đến từ việc học: câu đố ở đây và các nhiệm vụ đọc sách, làm bài. Hãy để dành, thư viện sẽ cần chúng!"
+        }
+      },
+      "guardian": {
+        "name": "Người gác rừng",
+        "locked": "Dừng lại, nhà thám hiểm nhỏ! Rừng phiêu lưu mở ở cấp {{level}}. Bạn đang ở cấp {{current}}. Cố lên nhé!",
+        "open": "Cổng đã mở cho bạn, {{name}}. Hãy đi dạo đường rừng, nhưng nhớ đi đúng lối nhé!"
+      }
+    },
+    "quest": {
+      "welcome": {
+        "title": "Lời chào ấm áp",
+        "desc": "Gặp hướng dẫn viên và tìm hiểu ngôi làng."
+      },
+      "academy": {
+        "title": "Những viên pha lê thất lạc",
+        "desc": "Giúp Giáo sư Cú bằng cách hoàn thành một bàn Pha lê trí nhớ."
+      },
+      "dailyMemory": {
+        "title": "Luyện trí nhớ mỗi ngày",
+        "desc": "Hoàn thành một bàn Pha lê trí nhớ hôm nay."
+      },
+      "realTask": "Việc thật",
+      "lockedHint": "Hãy hoàn thành nhiệm vụ trước đó."
+    },
+    "theme": {
+      "library": {
+        "title": "Cuốn sách tri thức cổ",
+        "desc": "Thủ thư cần bạn giúp khôi phục cuốn sách cổ. Hoàn thành \"{{task}}\" để tìm lại một trang bị mất."
+      },
+      "spring": {
+        "title": "Suối lấp lánh",
+        "desc": "Suối của làng sẽ lấp lánh hơn khi mọi người sạch sẽ. Hoàn thành \"{{task}}\" để suối tỏa sáng."
+      },
+      "builder": {
+        "title": "Vật liệu cho bác thợ xây",
+        "desc": "Nhà gọn gàng sẽ có thêm vật liệu xây dựng. Hoàn thành \"{{task}}\" để gom gạch cho làng."
+      },
+      "garden": {
+        "title": "Khu vườn của làng",
+        "desc": "Nhà thám hiểm khỏe mạnh trồng vườn tươi tốt. Hoàn thành \"{{task}}\" để khu vườn nở hoa."
+      },
+      "animals": {
+        "title": "Bạn của muôn loài",
+        "desc": "Các con vật cần người giúp đỡ tốt bụng. Hoàn thành \"{{task}}\" để được chúng tin yêu."
+      },
+      "expedition": {
+        "title": "Sẵn sàng thám hiểm",
+        "desc": "Mọi cuộc phiêu lưu đều bắt đầu từ sự chuẩn bị. Hoàn thành \"{{task}}\" để sẵn sàng."
+      },
+      "helper": {
+        "title": "Người giúp việc làng",
+        "desc": "Ngôi làng phát triển khi mọi người cùng góp sức. Hoàn thành \"{{task}}\" để giúp một tay."
+      }
+    },
+    "status": {
+      "locked": "Đã khóa",
+      "available": "Mới",
+      "active": "Đang làm",
+      "completed": "Nhận thưởng",
+      "rewarded": "Xong"
+    },
+    "action": {
+      "accept": "Nhận nhiệm vụ",
+      "markDone": "Con đã làm xong!",
+      "play": "Đi chơi",
+      "claim": "Nhận thưởng",
+      "cancel": "Bỏ"
+    },
+    "board": {
+      "intro": "Mỗi ngày, các việc thật của gia đình sẽ hiện ở đây.",
+      "activity": "Nhiệm vụ gia đình",
+      "story": "Câu chuyện",
+      "daily": "Hằng ngày",
+      "noTasks": "Hôm nay không có việc. Người lớn có thể thêm ở trang Việc cần làm.",
+      "empty": "Chưa có gì."
+    },
+    "resource": {
+      "xp": "Kinh nghiệm",
+      "coins": "Xu phiêu lưu",
+      "crystals": "Pha lê tri thức",
+      "materials": "Vật liệu xây dựng"
+    },
+    "ui": {
+      "close": "Đóng",
+      "level": "Cấp {{level}}",
+      "loading": "Đang mở cổng làng…",
+      "loadError": "Không tải được ngôi làng. Vui lòng thử lại.",
+      "avatar": "Nhân vật",
+      "quests": "Nhiệm vụ",
+      "switchPlayer": "Đổi người chơi",
+      "dashboard": "Chế độ phụ huynh",
+      "familyLevel": "Gia đình cấp {{level}}",
+      "hintKeys": "Di chuyển bằng phím mũi tên hoặc WASD. Nhấn E khi đứng gần để nói chuyện.",
+      "hintTouch": "Chạm vào đâu để đi tới đó. Chạm vào nhân vật để nói chuyện.",
+      "gotIt": "Đã hiểu",
+      "bye": "Tạm biệt!",
+      "back": "Quay lại"
+    },
+    "picker": {
+      "title": "Ai đang chơi?",
+      "subtitle": "Chọn nhà thám hiểm đang cầm máy."
+    },
+    "interact": {
+      "guide": "Nói chuyện với hướng dẫn viên",
+      "owl": "Nói chuyện với Giáo sư Cú",
+      "board": "Xem bảng nhiệm vụ",
+      "chest": "Mở rương báu",
+      "academy": "Vào Học viện",
+      "forestGate": "Đến cổng rừng",
+      "house": "Gõ cửa"
+    },
+    "chest": {
+      "title": "Kho báu hằng ngày",
+      "ready": "Chiếc rương đang phát sáng. Có gì đó bên trong!",
+      "claimed": "Bạn đã mở rương hôm nay rồi. Ngày mai sẽ có rương mới, không vội!",
+      "open": "Mở ra"
+    },
+    "house": {
+      "mine": "Ngôi nhà thân yêu. Bạn có thể đổi trang phục ở đây bất cứ lúc nào.",
+      "visit": "{{name}} vẫy tay chào từ cửa."
+    },
+    "avatar": {
+      "title": "Tùy chỉnh nhà thám hiểm",
+      "skin": "Màu da",
+      "hair": "Kiểu tóc",
+      "hairColor": "Màu tóc",
+      "outfit": "Trang phục",
+      "accessory": "Phụ kiện",
+      "save": "Lưu",
+      "hairOptions": {
+        "short": "Ngắn",
+        "long": "Dài",
+        "spiky": "Dựng",
+        "bun": "Búi"
+      },
+      "accessoryOptions": {
+        "none": "Không",
+        "cap": "Mũ lưỡi trai",
+        "bow": "Nơ",
+        "crown": "Vương miện",
+        "glasses": "Kính"
+      }
+    },
+    "memory": {
+      "title": "Thử thách Pha lê trí nhớ",
+      "levelTitle": "Màn {{level}}",
+      "hud": "Lượt {{moves}} · Cặp {{pairs}}/{{total}} · {{seconds}} giây",
+      "intro": "Hú! Mỗi viên pha lê có một viên sinh đôi. Hãy nhớ vị trí và ghép hết chúng.",
+      "step1": "Chạm hoặc nhấp vào thẻ để lật. Bàn phím: mũi tên để di chuyển, Enter để lật.",
+      "step2": "Lật hai thẻ. Nếu giống nhau, chúng sẽ mở.",
+      "step3": "Càng ít lượt và càng nhanh thì điểm càng cao.",
+      "pairs": "{{count}} cặp",
+      "practice": "Đã nhận thưởng hôm nay, chế độ luyện tập",
+      "locked": "Hãy qua màn trước",
+      "best": "Cao nhất: {{score}}",
+      "won": "Đã khôi phục tất cả pha lê!",
+      "score": "Điểm {{score}}",
+      "moves": "{{moves}} lượt",
+      "time": "{{seconds}} giây",
+      "rewardEarned": "Bạn nhận được",
+      "practiceDone": "Luyện tập tốt lắm! Bạn đã nhận thưởng màn này hôm nay.",
+      "tooFast": "Ôi, nhanh hơn cả cú chớp mắt! Hãy thử lại với tốc độ bình thường.",
+      "notCleared": "Chưa ghép hết. Thử lại nhé!",
+      "backToVillage": "Về làng",
+      "again": "Chơi lại",
+      "next": "Màn tiếp",
+      "leave": "Rời đi"
+    },
+    "error": {
+      "generic": "Có lỗi xảy ra. Vui lòng thử lại.",
+      "already_claimed": "Phần thưởng này đã được nhận.",
+      "quest_not_completed": "Hãy hoàn thành nhiệm vụ trước khi nhận thưởng.",
+      "quest_locked": "Nhiệm vụ này vẫn bị khóa.",
+      "quest_active": "Bạn đã nhận nhiệm vụ này.",
+      "quest_completed": "Nhiệm vụ này đã sẵn sàng nhận thưởng.",
+      "quest_rewarded": "Nhiệm vụ này đã xong.",
+      "quest_not_active": "Nhiệm vụ này không đang thực hiện.",
+      "quest_not_found": "Hôm nay không có nhiệm vụ này.",
+      "level_locked": "Hãy qua màn trước.",
+      "session_finished": "Ván chơi này đã kết thúc."
+    },
+    "guest": {
+      "name": "Nhà thám hiểm",
+      "banner": "Chế độ khách: tiến trình chỉ lưu trên thiết bị này.",
+      "signUp": "Đăng ký miễn phí",
+      "save": "Đăng ký để lưu",
+      "boardHint": "Tạo tài khoản gia đình miễn phí để biến việc nhà và bài tập thật thành nhiệm vụ ở đây."
+    }
   }
 }

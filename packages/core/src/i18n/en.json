@@ -22,7 +22,8 @@
     "rewards": "Rewards",
     "requests": "Requests",
     "family": "Family",
-    "calendar": "Calendar"
+    "calendar": "Calendar",
+    "play": "Adventure"
   },
   "landing": {
     "navLogin": "Log in",
@@ -68,7 +69,8 @@
     "finalCtaTitle": "Give it a try — your morning will thank you.",
     "finalCtaText": "Free to start. Takes about 2 minutes to set up. Works on any device your family already has.",
     "finalCtaBtn": "🚀 Start your family",
-    "footer": "© {{year}} · Built for families"
+    "footer": "© {{year}} · Built for families",
+    "ctaGuest": "🎮 Play as guest"
   },
   "auth": {
     "loginTitle": "Welcome back!",
@@ -113,7 +115,10 @@
     "tasksToday_other": "{{count}} tasks today",
     "doneRatio": "{{done}} / {{total}} done",
     "allDone": "All done! 🎉",
-    "grownUps": "Grown-ups"
+    "grownUps": "Grown-ups",
+    "adventureTitle": "Family Adventure World",
+    "adventureText": "Explore the village, take quests from real tasks, and play mini-games.",
+    "adventureGo": "Play ▸"
   },
   "tasks": {
     "title": "✅ Today's tasks",
@@ -185,5 +190,224 @@
     "ends": "Ends",
     "submit": "➕ Add it",
     "deleteConfirm": "Delete event?"
+  },
+  "game": {
+    "place": {
+      "academy": "Learning Academy",
+      "board": "Quest Board",
+      "forest": "Adventure Forest",
+      "house": "{{name}}'s House"
+    },
+    "npc": {
+      "guide": {
+        "name": "Village Guide",
+        "hello1": "Hello, {{name}}! Welcome to your family's village.",
+        "hello2": "Everything you do in real life helps this village grow. Brushing teeth, reading, tidying up: each one is a quest!",
+        "hello3": "Accept my first quest and I'll show you around.",
+        "back": "Welcome back, {{name}}! There are {{count}} family quests waiting on the board today.",
+        "askVillage": "Tell me about the village",
+        "askQuests": "How do quests work?",
+        "openBoard": "Show me the Quest Board",
+        "topic": {
+          "village": "Up north is the Learning Academy, where Professor Owl hosts puzzles. Each family member has a house here. East, past the river, lies the Adventure Forest. It opens when you reach level 3.",
+          "quests": "Accept a quest, then do the real task. When a grown-up or you marks it done, come back and claim your reward. Each quest can only be claimed once."
+        }
+      },
+      "owl": {
+        "name": "Professor Owl",
+        "hello": "Hoo-hoo! Hello, {{name}}. My Memory Crystals have been scattered. Can you find the matching pairs?",
+        "back": "Hoo! Back for more practice, {{name}}? Sharp minds grow with every game.",
+        "play": "Play the Memory Crystal Challenge",
+        "askCrystals": "What are Knowledge Crystals?",
+        "topic": {
+          "crystals": "Knowledge Crystals come from learning: puzzles here and reading or homework quests. Save them up; the library will need them!"
+        }
+      },
+      "guardian": {
+        "name": "Forest Guardian",
+        "locked": "Halt, little explorer! The Adventure Forest opens at level {{level}}. You are level {{current}}. Keep questing!",
+        "open": "The gate is open for you, {{name}}. Walk the forest trails, but stay on the path!"
+      }
+    },
+    "quest": {
+      "welcome": {
+        "title": "A Warm Welcome",
+        "desc": "Meet the Village Guide and learn how the village works."
+      },
+      "academy": {
+        "title": "The Scattered Crystals",
+        "desc": "Help Professor Owl by clearing a Memory Crystal board."
+      },
+      "dailyMemory": {
+        "title": "Daily Brain Training",
+        "desc": "Clear one Memory Crystal board today."
+      },
+      "realTask": "Real-life task",
+      "lockedHint": "Finish the earlier story quest first."
+    },
+    "theme": {
+      "library": {
+        "title": "The Ancient Book of Knowledge",
+        "desc": "The librarian needs your help restoring the Ancient Book. Complete \"{{task}}\" to recover a lost page."
+      },
+      "spring": {
+        "title": "The Sparkle Spring",
+        "desc": "The village spring sparkles brighter when everyone stays fresh. Complete \"{{task}}\" to make it shine."
+      },
+      "builder": {
+        "title": "Materials for the Master Builder",
+        "desc": "A tidy home means extra building materials. Complete \"{{task}}\" to gather bricks for the village."
+      },
+      "garden": {
+        "title": "The Village Garden",
+        "desc": "Healthy explorers grow a healthy garden. Complete \"{{task}}\" to help the garden bloom."
+      },
+      "animals": {
+        "title": "Friends of the Forest",
+        "desc": "The animals count on kind helpers. Complete \"{{task}}\" to earn their trust."
+      },
+      "expedition": {
+        "title": "Expedition Ready",
+        "desc": "Every great adventure starts with good preparation. Complete \"{{task}}\" to get ready."
+      },
+      "helper": {
+        "title": "Village Helper",
+        "desc": "The village thrives when everyone pitches in. Complete \"{{task}}\" to lend a hand."
+      }
+    },
+    "status": {
+      "locked": "Locked",
+      "available": "New",
+      "active": "In progress",
+      "completed": "Ready to claim",
+      "rewarded": "Done"
+    },
+    "action": {
+      "accept": "Accept quest",
+      "markDone": "I did it!",
+      "play": "Go play",
+      "claim": "Claim reward",
+      "cancel": "Drop"
+    },
+    "board": {
+      "intro": "Quests from your family's real tasks appear here every day.",
+      "activity": "Family quests",
+      "story": "Story",
+      "daily": "Daily",
+      "noTasks": "No tasks due today. A grown-up can add some on the Tasks page.",
+      "empty": "Nothing here yet."
+    },
+    "resource": {
+      "xp": "XP",
+      "coins": "Adventure Coins",
+      "crystals": "Knowledge Crystals",
+      "materials": "Building Materials"
+    },
+    "ui": {
+      "close": "Close",
+      "level": "Lv {{level}}",
+      "loading": "Opening the village gates…",
+      "loadError": "The village could not load. Please try again.",
+      "avatar": "Avatar",
+      "quests": "Quests",
+      "switchPlayer": "Switch player",
+      "dashboard": "Parent view",
+      "familyLevel": "Family Lv {{level}}",
+      "hintKeys": "Move with arrow keys or WASD. Press E near someone to talk.",
+      "hintTouch": "Tap anywhere to walk there. Tap a character to talk.",
+      "gotIt": "Got it",
+      "bye": "Goodbye!",
+      "back": "Back"
+    },
+    "picker": {
+      "title": "Who is playing?",
+      "subtitle": "Pick the explorer holding the device."
+    },
+    "interact": {
+      "guide": "Talk to the Village Guide",
+      "owl": "Talk to Professor Owl",
+      "board": "Read the Quest Board",
+      "chest": "Open the treasure chest",
+      "academy": "Enter the Academy",
+      "forestGate": "Approach the forest gate",
+      "house": "Knock on the door"
+    },
+    "chest": {
+      "title": "Daily Treasure",
+      "ready": "The chest is glowing. Something is waiting inside!",
+      "claimed": "You already opened today's chest. A new one appears tomorrow, no rush!",
+      "open": "Open it"
+    },
+    "house": {
+      "mine": "Home sweet home. Change your look here anytime.",
+      "visit": "{{name}} waves hello from the doorway."
+    },
+    "avatar": {
+      "title": "Customize your explorer",
+      "skin": "Skin",
+      "hair": "Hair",
+      "hairColor": "Hair color",
+      "outfit": "Outfit",
+      "accessory": "Accessory",
+      "save": "Save look",
+      "hairOptions": {
+        "short": "Short",
+        "long": "Long",
+        "spiky": "Spiky",
+        "bun": "Bun"
+      },
+      "accessoryOptions": {
+        "none": "None",
+        "cap": "Cap",
+        "bow": "Bow",
+        "crown": "Crown",
+        "glasses": "Glasses"
+      }
+    },
+    "memory": {
+      "title": "Memory Crystal Challenge",
+      "levelTitle": "Level {{level}}",
+      "hud": "Moves {{moves}}  ·  Pairs {{pairs}}/{{total}}  ·  {{seconds}}s",
+      "intro": "Hoo! Each crystal has a twin. Remember where they are and match them all.",
+      "step1": "Tap or click a card to flip it. Keyboard: arrows to move, Enter to flip.",
+      "step2": "Flip two cards. If they match, they stay open.",
+      "step3": "Fewer moves and a quicker time give a higher score.",
+      "pairs": "{{count}} pairs",
+      "practice": "Reward earned today, practice mode",
+      "locked": "Clear the previous level first",
+      "best": "Best: {{score}}",
+      "won": "All crystals restored!",
+      "score": "Score {{score}}",
+      "moves": "{{moves}} moves",
+      "time": "{{seconds}}s",
+      "rewardEarned": "You earned",
+      "practiceDone": "Great practice! You already earned today's reward for this level.",
+      "tooFast": "Whoa, that was faster than an owl can blink! Try again at a normal pace.",
+      "notCleared": "The board was not cleared. Give it another go!",
+      "backToVillage": "Back to village",
+      "again": "Play again",
+      "next": "Next level",
+      "leave": "Leave"
+    },
+    "error": {
+      "generic": "Something went wrong. Please try again.",
+      "already_claimed": "That reward was already claimed.",
+      "quest_not_completed": "Finish the quest first, then claim.",
+      "quest_locked": "This quest is still locked.",
+      "quest_active": "You already accepted this quest.",
+      "quest_completed": "This quest is ready to claim.",
+      "quest_rewarded": "This quest is already done.",
+      "quest_not_active": "This quest is not in progress.",
+      "quest_not_found": "That quest is not available today.",
+      "level_locked": "Clear the previous level first.",
+      "session_finished": "That game already ended."
+    },
+    "guest": {
+      "name": "Explorer",
+      "banner": "Guest mode: progress is saved on this device only.",
+      "signUp": "Sign up free",
+      "save": "Sign up to save",
+      "boardHint": "Create a free family account to turn real chores and homework into quests here."
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { lazy, Suspense, useEffect, useState, useSyncExternalStore } from "react";
 import { Route, Routes } from "react-router-dom";
 import { auth } from "./lib/api";
 import { Landing } from "./pages/Landing";
@@ -15,6 +15,10 @@ import { EventsPage } from "./pages/Events";
 import { TopBar } from "./components/TopBar";
 import { Drawer } from "./components/Drawer";
 import { BottomTabs } from "./components/BottomTabs";
+
+// Phaser is large; keep it out of the main bundle until someone opens the game.
+const PlayPage = lazy(() => import("./pages/Play"));
+const GuestPlayPage = lazy(() => import("./pages/GuestPlay"));
 
 const DRAWER_COLLAPSED_KEY = "fh.drawerCollapsed";
 const MOBILE_BREAKPOINT = 820;
@@ -101,12 +105,30 @@ export function App() {
                 <Route path="rewards" element={<RewardsPage />} />
                 <Route path="redemptions" element={<RedemptionsPage />} />
                 <Route path="events" element={<EventsPage />} />
+                <Route
+                  path="play"
+                  element={
+                    <Suspense fallback={<div className="card">…</div>}>
+                      <PlayPage />
+                    </Suspense>
+                  }
+                />
               </Routes>
             </Shell>
           }
         />
       ) : (
-        <Route path="/*" element={<Landing />} />
+        <>
+          <Route
+            path="/play"
+            element={
+              <Suspense fallback={<div className="card">…</div>}>
+                <GuestPlayPage />
+              </Suspense>
+            }
+          />
+          <Route path="/*" element={<Landing />} />
+        </>
       )}
     </Routes>
   );

@@ -1050,3 +1050,16 @@ label {
 
   .profile-trigger, .menu-trigger { height: 40px; }
 }
+
+/* Dashboard entry to the adventure game */
+.adventure-cta {
+  display: flex; align-items: center; gap: 14px; text-decoration: none; color: #fff;
+  background: linear-gradient(120deg, #4b3a8c, #6b4fd8 55%, #0ea5a4);
+}
+.adventure-cta strong { display: block; font-size: 18px; }
+.adventure-cta .muted { color: #e6e0ff; display: block; }
+.adventure-cta-art { font-size: 36px; }
+.adventure-cta-go {
+  margin-left: auto; background: #f6c445; color: #2a2140; font-weight: 800;
+  border-radius: 999px; padding: 8px 16px; white-space: nowrap;
+}

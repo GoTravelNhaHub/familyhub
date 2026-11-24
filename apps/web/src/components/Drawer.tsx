@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 interface NavItem { to: string; emoji: string; key: string }
 const NAV: NavItem[] = [
   { to: "/", emoji: "🏠", key: "nav.home" },
+  { to: "/play", emoji: "🗺️", key: "nav.play" },
   { to: "/tasks", emoji: "✅", key: "nav.tasks" },
   { to: "/rewards", emoji: "🎁", key: "nav.rewards" },
   { to: "/redemptions", emoji: "📬", key: "nav.requests" },

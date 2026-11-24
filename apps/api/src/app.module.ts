@@ -12,6 +12,7 @@ import { RedemptionsModule } from "./redemptions/redemptions.module";
 import { StarAdjustmentsModule } from "./star-adjustments/star-adjustments.module";
 import { EventsModule } from "./events/events.module";
 import { StarBalanceModule } from "./star-balance/star-balance.module";
+import { GameModule } from "./game/game.module";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { StarBalanceModule } from "./star-balance/star-balance.module";
     StarAdjustmentsModule,
     EventsModule,
     StarBalanceModule,
+    GameModule,
   ],
 })
 export class AppModule {}
