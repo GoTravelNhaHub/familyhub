@@ -170,7 +170,7 @@ importers:
         specifier: ^8.0.0
         version: 8.2.1
       phaser:
-        specifier: 3.88.2
+        specifier: ^3.88.2
         version: 3.88.2
       react:
         specifier: ^18.3.1
