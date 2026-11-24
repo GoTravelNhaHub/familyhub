@@ -961,6 +961,8 @@ label {
   }
 
   .shell.is-mobile {
+    --tabbar-h: 55px;
+    height: 100%;           /* fallback for browsers without dvh */
     height: 100dvh;         /* dynamic viewport, accounts for mobile chrome */
     min-height: 0;
     overflow: hidden;
@@ -969,6 +971,8 @@ label {
     flex: 1 1 auto;
     min-height: 0;
     overflow: hidden;
+    /* Room for the fixed tab bar */
+    padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
   }
   .shell.is-mobile .shell-main {
     flex: 1 1 auto;
@@ -979,7 +983,11 @@ label {
     padding: 14px;
     max-width: 100%;
   }
-  .shell.is-mobile .bottom-tabs { display: flex; }
+  /* Pinned to the viewport so it stays put whichever element scrolls */
+  .shell.is-mobile .bottom-tabs {
+    display: flex;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  }
 
   /* Topbar stays, but strips to just the essentials */
   .topbar {
@@ -1022,6 +1030,7 @@ label {
 
 /* Narrower phones — keep labels, just make the whole tab tighter. */
 @media (max-width: 400px) {
+  .shell.is-mobile { --tabbar-h: 51px; }
   .bottom-tab { padding: 5px 1px; gap: 2px; min-height: 50px; }
   .bottom-tab-emoji { font-size: 18px; }
   .bottom-tab-label { font-size: 9px; }
