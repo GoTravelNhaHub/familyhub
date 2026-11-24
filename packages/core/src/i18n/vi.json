@@ -317,7 +317,12 @@
       "hintTouch": "Chạm vào đâu để đi tới đó. Chạm vào nhân vật để nói chuyện.",
       "gotIt": "Đã hiểu",
       "bye": "Tạm biệt!",
-      "back": "Quay lại"
+      "back": "Quay lại",
+      "xp": "{{into}} / {{span}} XP",
+      "map": "Bản đồ làng",
+      "mapShow": "Hiện bản đồ",
+      "mapHide": "Ẩn bản đồ",
+      "next": "Tiếp"
     },
     "picker": {
       "title": "Ai đang chơi?",
@@ -408,6 +413,27 @@
       "signUp": "Đăng ký miễn phí",
       "save": "Đăng ký để lưu",
       "boardHint": "Tạo tài khoản gia đình miễn phí để biến việc nhà và bài tập thật thành nhiệm vụ ở đây."
+    },
+    "track": {
+      "label": "Mục tiêu",
+      "claim": "Nhận thưởng từ {{who}}",
+      "talk": "Nói chuyện với {{who}}",
+      "memory": "Chơi trò trí nhớ cùng {{who}}",
+      "task": "Làm thật ngoài đời, rồi bấm “Con đã làm xong!” trên Bảng nhiệm vụ",
+      "accept": "Đến gặp {{who}} để nhận nhiệm vụ",
+      "chest": "Mở rương báu hôm nay",
+      "explore": "Hôm nay xong hết rồi! Đi dạo quanh làng nhé.",
+      "go": "Đi"
+    },
+    "tutorial": {
+      "title": "Chào nhà thám hiểm!",
+      "step": "Bước {{n}}/{{total}}",
+      "moveKeys": "Đi lại bằng phím mũi tên hoặc WASD.",
+      "moveTouch": "Chạm vào mặt đất để đi tới đó.",
+      "talkKeys": "Đi theo ánh sáng vàng đến Hướng dẫn viên làng, rồi bấm E.",
+      "talkTouch": "Đi theo ánh sáng vàng đến Hướng dẫn viên làng, rồi chạm vào họ.",
+      "quests": "Mở Nhiệm vụ bất cứ lúc nào để xem việc cần làm tiếp.",
+      "skip": "Bỏ qua"
     }
   }
 }

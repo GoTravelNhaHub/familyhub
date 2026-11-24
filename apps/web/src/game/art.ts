@@ -503,6 +503,112 @@ export function generateWorldArt(scene: Phaser.Scene) {
     ctx.fillStyle = "#5a3d6b";
     rr(ctx, 9, 3, 2, 10, 1);
   });
+  generateFxArt(scene);
+}
+
+/** Lighting, highlight, and guidance sprites layered over the world. */
+function generateFxArt(scene: Phaser.Scene) {
+  canvasTexture(scene, "soft-shadow", 64, 24, (ctx) => {
+    const g = ctx.createRadialGradient(32, 12, 0, 32, 12, 32);
+    g.addColorStop(0, "rgba(20, 30, 20, 0.42)");
+    g.addColorStop(0.6, "rgba(20, 30, 20, 0.2)");
+    g.addColorStop(1, "rgba(20, 30, 20, 0)");
+    ctx.fillStyle = g;
+    ctx.setTransform(1, 0, 0, 24 / 64, 0, 0);
+    ctx.fillRect(0, 0, 64, 64);
+  });
+  // Highlight ring under the interactable the player is next to.
+  canvasTexture(scene, "ring", 128, 52, (ctx) => {
+    ctx.strokeStyle = "rgba(255, 236, 140, 0.95)";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.ellipse(64, 26, 58, 21, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(64, 26, 50, 17, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  });
+  // Soft column of light marking the tracked objective.
+  canvasTexture(scene, "beacon", 64, 160, (ctx) => {
+    const g = ctx.createLinearGradient(0, 160, 0, 0);
+    g.addColorStop(0, "rgba(255, 225, 120, 0.55)");
+    g.addColorStop(1, "rgba(255, 225, 120, 0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(10, 160);
+    ctx.lineTo(24, 0);
+    ctx.lineTo(40, 0);
+    ctx.lineTo(54, 160);
+    ctx.fill();
+  });
+  // Off-screen objective pointer (points right; rotated at runtime).
+  canvasTexture(scene, "edge-arrow", 56, 56, (ctx) => {
+    ctx.fillStyle = "rgba(42, 33, 64, 0.9)";
+    circle(ctx, 28, 28, 25);
+    ctx.fillStyle = "#f6c445";
+    ctx.beginPath();
+    ctx.moveTo(44, 28);
+    ctx.lineTo(20, 14);
+    ctx.lineTo(25, 28);
+    ctx.lineTo(20, 42);
+    ctx.closePath();
+    ctx.fill();
+  });
+  canvasTexture(scene, "ripple", 64, 24, (ctx) => {
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.ellipse(32, 12, 28, 9, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  });
+  canvasTexture(scene, "lily", 40, 28, (ctx) => {
+    ctx.fillStyle = "#3f9a46";
+    ctx.beginPath();
+    ctx.ellipse(20, 14, 16, 10, 0, 0.35, Math.PI * 2 - 0.1);
+    ctx.lineTo(20, 14);
+    ctx.fill();
+    ctx.fillStyle = "#5bbf5f";
+    ctx.beginPath();
+    ctx.ellipse(18, 12, 9, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#ffb3d1";
+    circle(ctx, 26, 10, 3.5);
+  });
+  canvasTexture(scene, "reeds", 40, 48, (ctx) => {
+    ctx.strokeStyle = "#4b8a3c";
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    for (const [x, lean, h] of [[12, -6, 40], [20, 2, 46], [28, 7, 38], [16, -2, 30]] as const) {
+      ctx.beginPath();
+      ctx.moveTo(x, 46);
+      ctx.quadraticCurveTo(x + lean / 2, 46 - h / 2, x + lean, 46 - h);
+      ctx.stroke();
+    }
+    ctx.fillStyle = "#7a4f2e";
+    rr(ctx, 18, 4, 5, 12, 2.5);
+    rr(ctx, 27, 10, 4, 10, 2);
+  });
+  canvasTexture(scene, "lamp", 36, 112, (ctx) => {
+    shadow(ctx, 18, 106, 12, 4);
+    ctx.fillStyle = "#3d3557";
+    rr(ctx, 15, 30, 6, 76, 3);
+    rr(ctx, 10, 100, 16, 6, 3);
+    rr(ctx, 7, 6, 22, 6, 3);
+    ctx.fillStyle = "#ffe8a3";
+    rr(ctx, 10, 12, 16, 18, 4);
+    ctx.fillStyle = "#3d3557";
+    rr(ctx, 9, 28, 18, 4, 2);
+  });
+  canvasTexture(scene, "light", 128, 128, (ctx) => {
+    const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    g.addColorStop(0, "rgba(255, 214, 120, 0.85)");
+    g.addColorStop(0.5, "rgba(255, 190, 90, 0.3)");
+    g.addColorStop(1, "rgba(255, 170, 60, 0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 128, 128);
+  });
 }
 
 export function ensureHouseTexture(scene: Phaser.Scene, roof: string): string {

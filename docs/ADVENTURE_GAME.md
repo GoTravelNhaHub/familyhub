@@ -25,6 +25,7 @@ A playable village at `/play` (nav: **Adventure**) layered on the existing app. 
   - `GameCanvas.tsx` creates one `Phaser.Game` per mount and destroys it on unmount. It renders at device pixel ratio (capped at 2).
   - `scenes/VillageScene.ts`: arcade physics collisions, y-depth sorting, camera follow, keyboard (WASD/arrows, E) and tap-to-move with A* (`pathfinding.ts`), NPCs, quest markers, day/night tint, ambient particles. `scenes/MemoryScene.ts`: the mini-game.
   - `bridge.ts`: a typed event channel. Phaser renders; React owns data, dialogue, and API calls.
+  - `ui/Hud.tsx`: viewport-anchored HUD (player card, animated XP, objective tracker, menu, SVG minimap, first-run coach). `pickObjective` chooses the tracked quest; the scene draws its beacon and off-screen arrow (`track` event). The tracker's Go button and minimap taps use `walkTo`.
   - `world.ts`: the data-driven layout. `art.ts`/`avatar.ts`: all art is original and drawn on canvas at runtime (no external assets).
   - `prefers-reduced-motion` disables tweens, particles, and fades.
 - Copy: `game.*` keys in `packages/core/src/i18n/{en,zh,vi}.json`.

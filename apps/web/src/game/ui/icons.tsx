@@ -66,3 +66,85 @@ export function RewardChips({ reward, label }: { reward: Resources; label: (k: k
 }
 
 export { ICONS as RESOURCE_ICONS };
+
+/* Portraits and menu glyphs for the HUD and dialogue headers. */
+
+export function OwlIcon({ size = 40 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden>
+      <ellipse cx="20" cy="24" rx="13" ry="14" fill="#8a5a3c" />
+      <ellipse cx="20" cy="28" rx="8" ry="9" fill="#e8c9a0" />
+      <path d="M8 12 L12 4 L16 11 Z M32 12 L28 4 L24 11 Z" fill="#6f4630" />
+      <circle cx="14.5" cy="17" r="5.5" fill="#fff" />
+      <circle cx="25.5" cy="17" r="5.5" fill="#fff" />
+      <circle cx="15" cy="17.5" r="2.6" fill="#2a2140" />
+      <circle cx="25" cy="17.5" r="2.6" fill="#2a2140" />
+      <circle cx="14.5" cy="17" r="5.5" fill="none" stroke="#2a2140" strokeWidth="1.2" />
+      <circle cx="25.5" cy="17" r="5.5" fill="none" stroke="#2a2140" strokeWidth="1.2" />
+      <path d="M18 22 L20 25 L22 22 Z" fill="#f6c445" />
+    </svg>
+  );
+}
+
+export function ScrollIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden>
+      <rect x="4" y="3" width="12" height="14" rx="2" fill="#fff3d0" stroke="#b8893a" strokeWidth="1.4" />
+      <path d="M7 7 H13 M7 10 H13 M7 13 H11" stroke="#b8893a" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function ChestIcon({ size = 40 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden>
+      <rect x="6" y="18" width="28" height="16" rx="3" fill="#a0602e" />
+      <path d="M6 18 Q6 8 20 8 Q34 8 34 18 Z" fill="#c27a3c" />
+      <rect x="6" y="17" width="28" height="4" fill="#f6c445" />
+      <rect x="17" y="17" width="6" height="9" rx="1.5" fill="#f6c445" stroke="#b8893a" />
+    </svg>
+  );
+}
+
+export function GateIcon({ size = 40 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden>
+      <path d="M20 4 L33 9 V20 C33 28 27 33 20 36 C13 33 7 28 7 20 V9 Z" fill="#3f9a46" stroke="#2c6e33" strokeWidth="2" />
+      <path d="M14 20 L18 24 L26 15" stroke="#fff7d6" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function ShirtIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden>
+      <path d="M7 3 L3 6 L5 9 L6 8.5 V17 H14 V8.5 L15 9 L17 6 L13 3 C12 5 8 5 7 3 Z" fill="#8fb7ff" stroke="#3b5fb8" strokeWidth="1.3" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function SwapIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden>
+      <path d="M4 7 H15 L12 4 M16 13 H5 L8 16" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function MapIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden>
+      <path d="M2.5 5 L7 3 L13 5 L17.5 3 V15 L13 17 L7 15 L2.5 17 Z" fill="#d9f0c9" stroke="#3f7a3a" strokeWidth="1.3" strokeLinejoin="round" />
+      <path d="M7 3 V15 M13 5 V17" stroke="#3f7a3a" strokeWidth="1.1" />
+    </svg>
+  );
+}
+
+export function PinIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden>
+      <path d="M10 18 C10 18 4 11.5 4 8 A6 6 0 0 1 16 8 C16 11.5 10 18 10 18 Z" fill="#f6c445" stroke="#b8893a" strokeWidth="1.3" />
+      <circle cx="10" cy="8" r="2.2" fill="#fff" />
+    </svg>
+  );
+}

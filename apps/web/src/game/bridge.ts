@@ -21,11 +21,19 @@ export interface MemoryFinish {
   flips: number[];
 }
 
+/** A floating "+10" label shown in the world when rewards land. */
+export interface RewardFloat {
+  text: string;
+  color: string;
+}
+
 interface Events {
   /** Phaser -> React */
   ready: void;
   nearby: InteractableId | null;
   interact: InteractableId;
+  /** Player feet position in world pixels, throttled. */
+  player: { x: number; y: number };
   memoryFinished: MemoryFinish;
   memoryExit: void;
   /** React -> Phaser */
@@ -33,8 +41,13 @@ interface Events {
   triggerInteract: void;
   startMemory: MemorySession;
   endMemory: void;
-  celebrate: { x?: number; y?: number };
+  /** Sparkle burst at an interactable (or the player) with optional reward labels. */
+  celebrate: { at?: InteractableId; items?: RewardFloat[] };
   setInputEnabled: boolean;
+  /** Objective the HUD tracks: beacon in the world, arrow at the screen edge. */
+  track: InteractableId | null;
+  /** Walk to an interactable (and use it) or to a world point. */
+  walkTo: { id: InteractableId } | { x: number; y: number };
 }
 
 type Handler<T> = (payload: T) => void;

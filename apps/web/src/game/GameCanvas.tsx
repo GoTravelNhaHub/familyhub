@@ -36,12 +36,14 @@ export function GameCanvas({ bridge }: { bridge: GameBridge }) {
       physics: { default: "arcade", arcade: { debug: false } },
       render: { antialias: true, roundPixels: false, powerPreference: "low-power" },
       input: { activePointers: 2 },
+      audio: { noAudio: true }, // the game has no sound; avoids AudioContext errors on teardown
       callbacks: {
         preBoot: (g) => {
           g.registry.set("bridge", bridge);
           g.registry.set("t", (key: string, params?: Record<string, unknown>) => tRef.current(key, params) as string);
           g.registry.set("dpr", dpr);
           g.registry.set("reducedMotion", reducedMotion);
+          g.registry.set("touch", window.matchMedia?.("(pointer: coarse)").matches ?? false);
         },
       },
       scene: [VillageScene, MemoryScene],

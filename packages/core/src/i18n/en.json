@@ -317,7 +317,12 @@
       "hintTouch": "Tap anywhere to walk there. Tap a character to talk.",
       "gotIt": "Got it",
       "bye": "Goodbye!",
-      "back": "Back"
+      "back": "Back",
+      "xp": "{{into}} / {{span}} XP",
+      "map": "Village map",
+      "mapShow": "Show map",
+      "mapHide": "Hide map",
+      "next": "Next"
     },
     "picker": {
       "title": "Who is playing?",
@@ -408,6 +413,27 @@
       "signUp": "Sign up free",
       "save": "Sign up to save",
       "boardHint": "Create a free family account to turn real chores and homework into quests here."
+    },
+    "track": {
+      "label": "Objective",
+      "claim": "Collect your reward from {{who}}",
+      "talk": "Talk to {{who}}",
+      "memory": "Play the memory game with {{who}}",
+      "task": "Do it for real, then tap “I did it!” on the Quest Board",
+      "accept": "Visit {{who}} to start a quest",
+      "chest": "Open today's treasure chest",
+      "explore": "All done for today! Explore the village.",
+      "go": "Go"
+    },
+    "tutorial": {
+      "title": "Welcome, explorer!",
+      "step": "Step {{n}} of {{total}}",
+      "moveKeys": "Walk around with the arrow keys or WASD.",
+      "moveTouch": "Tap the ground to walk there.",
+      "talkKeys": "Follow the golden light to the Village Guide, then press E.",
+      "talkTouch": "Follow the golden light to the Village Guide, then tap them.",
+      "quests": "Open Quests anytime to see what to do next.",
+      "skip": "Skip"
     }
   }
 }

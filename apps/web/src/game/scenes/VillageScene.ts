@@ -1,31 +1,39 @@
 import Phaser from "phaser";
-import { avatarKey, type AvatarConfig, type Facing } from "../avatar";
+import { avatarKey, GUIDE_LOOK, type AvatarConfig, type Facing } from "../avatar";
 import { ensureAvatarTexture, ensureHouseTexture, generateNpcArt, generateWorldArt, idleFrame } from "../art";
-import type { GameBridge, InteractableId, Marker, WorldSnapshot } from "../bridge";
+import type { GameBridge, InteractableId, Marker, RewardFloat, WorldSnapshot } from "../bridge";
 import type { MemorySession } from "../types";
 import { NavGrid, type Point } from "../pathfinding";
 import {
   FOREST_FENCE_X,
   HOUSE_SLOTS,
   INTERACTABLES,
+  LAMPS,
   NPCS,
   PROPS,
+  PLAZA,
   RIVER,
   SPAWN,
   WORLD_H,
   WORLD_W,
+  mulberry32,
   scatterDecorations,
   type Interactable,
 } from "../world";
 
 const SPEED = 150;
 const AVATAR_SCALE = 0.5;
-const GUIDE_LOOK: AvatarConfig = {
-  v: 1, skin: "#eab68f", hair: "bun", hairColor: "#5a5f7a", outfit: "#0ea5a4", accessory: "glasses",
-};
 const MARKER_OFFSET: Partial<Record<InteractableId, number>> = { guide: -84, owl: -90, board: -140, chest: -52 };
 /** Clearance around obstacles for the player's footprint when path-finding. */
 const NAV_PAD = 9;
+/** Highlight ring size per interactable (1 = 128x52 world px). */
+const RING_SCALE: Partial<Record<InteractableId, number>> = {
+  guide: 0.5, owl: 0.55, board: 0.7, chest: 0.55, academy: 1.9, forestGate: 0.9,
+};
+/** Things that hop when used (buildings stay put and get a ring flash instead). */
+const HOPPERS: InteractableId[] = ["guide", "owl", "board", "chest"];
+/** Viewport insets in CSS px kept clear for the HUD when placing the objective arrow. */
+const EDGE_INSET = { top: 72, right: 40, bottom: 96, left: 40 };
 
 type Translate = (key: string, params?: Record<string, unknown>) => string;
 
@@ -50,6 +58,26 @@ export class VillageScene extends Phaser.Scene {
   private chest!: Phaser.GameObjects.Image;
   private nightOverlay!: Phaser.GameObjects.Rectangle;
   private fireflies?: Phaser.GameObjects.Particles.ParticleEmitter;
+  private lampLights: Phaser.GameObjects.Image[] = [];
+
+  private touch = false;
+  private playerShadow!: Phaser.GameObjects.Image;
+  private dust?: Phaser.GameObjects.Particles.ParticleEmitter;
+  private dustMs = 0;
+  private bushes: Phaser.GameObjects.Image[] = [];
+  private rustling = new Set<Phaser.GameObjects.Image>();
+  private rustleMs = 0;
+  /** World objects keyed by interactable, for hop and flash feedback. */
+  private things = new Map<InteractableId, Phaser.GameObjects.Image | Phaser.GameObjects.Sprite>();
+  private highlight!: Phaser.GameObjects.Image;
+  private prompt!: Phaser.GameObjects.Text;
+  private tracked: InteractableId | null = null;
+  private beacon!: Phaser.GameObjects.Image;
+  private edgeArrow!: Phaser.GameObjects.Image;
+  private chestOpen: boolean | null = null;
+  private playerEmitMs = 0;
+  private baseZoom = 1;
+  private focused = false;
 
   private keys!: Record<"up" | "down" | "left" | "right" | "w" | "a" | "s" | "d" | "e" | "space" | "enter", Phaser.Input.Keyboard.Key>;
   private target: Point | null = null;
@@ -78,6 +106,7 @@ export class VillageScene extends Phaser.Scene {
     this.t = this.registry.get("t") as Translate;
     this.dpr = (this.registry.get("dpr") as number) ?? 1;
     this.reducedMotion = !!this.registry.get("reducedMotion");
+    this.touch = !!this.registry.get("touch");
 
     generateWorldArt(this);
     generateNpcArt(this);
@@ -87,18 +116,22 @@ export class VillageScene extends Phaser.Scene {
     this.obstacles = this.physics.add.staticGroup();
 
     this.buildRiver();
+    this.buildWaterLife();
     this.buildDecorations();
     this.buildProps();
+    this.buildLamps();
     this.buildForestFence();
     this.buildNpcs();
     this.buildPlayer();
+    this.buildGuidance();
     this.buildAmbience();
     this.buildInput();
     this.rebuildNav();
 
     const cam = this.cameras.main;
     cam.setBounds(0, 0, WORLD_W, WORLD_H);
-    cam.startFollow(this.player, true, this.reducedMotion ? 1 : 0.12, this.reducedMotion ? 1 : 0.12);
+    const lerp = this.reducedMotion ? 1 : 0.09;
+    cam.startFollow(this.player, true, lerp, lerp);
     this.applyZoom();
     this.scale.on(Phaser.Scale.Events.RESIZE, this.onResize, this);
     if (!this.reducedMotion) cam.fadeIn(400, 0, 0, 0);
@@ -107,11 +140,26 @@ export class VillageScene extends Phaser.Scene {
       this.bridge.on("world", (w) => this.applyWorld(w)),
       this.bridge.on("triggerInteract", () => this.interact()),
       this.bridge.on("setInputEnabled", (enabled) => this.setInputEnabled(enabled)),
-      this.bridge.on("celebrate", () => this.celebrate(this.player.x, this.player.y - 20)),
+      this.bridge.on("celebrate", ({ at, items }) => this.celebrate(at, items)),
+      this.bridge.on("track", (id) => this.setTracked(id)),
+      this.bridge.on("walkTo", (dest) => {
+        if (!this.inputEnabled) return;
+        if ("id" in dest) {
+          const at = this.interactables.find((i) => i.id === dest.id);
+          if (!at) return;
+          this.pendingInteract = at.id;
+          this.walkTo({ x: at.x, y: at.y });
+        } else {
+          this.pendingInteract = null;
+          this.walkTo(dest);
+        }
+      }),
       this.bridge.on("startMemory", (session) => this.enterMemory(session)),
     );
     const snapshot = this.bridge.latest("world");
     if (snapshot) this.applyWorld(snapshot);
+    const tracked = this.bridge.latest("track");
+    if (tracked !== undefined) this.setTracked(tracked);
 
     this.events.on(Phaser.Scenes.Events.WAKE, this.onWake, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
@@ -180,6 +228,7 @@ export class VillageScene extends Phaser.Scene {
         }
       } else {
         this.block(d.x, d.y - 6, d.kind === "bush" ? 36 : 32, 14);
+        if (d.kind === "bush") this.bushes.push(img);
       }
     }
   }
@@ -188,7 +237,7 @@ export class VillageScene extends Phaser.Scene {
     for (const p of PROPS) {
       switch (p.kind) {
         case "academy":
-          this.add.image(p.x, p.y, "academy").setOrigin(0.5, 0.95).setScale(0.8).setDepth(p.y);
+          this.things.set("academy", this.add.image(p.x, p.y, "academy").setOrigin(0.5, 0.95).setScale(0.8).setDepth(p.y));
           this.block(p.x, p.y - 58, 232, 92);
           this.label(p.x, p.y - 214, this.t("game.place.academy"));
           break;
@@ -212,12 +261,15 @@ export class VillageScene extends Phaser.Scene {
           break;
         }
         case "board":
-          this.add.image(p.x, p.y, "board").setOrigin(0.5, 0.92).setScale(0.7).setDepth(p.y);
+          this.add.image(p.x, p.y - 2, "soft-shadow").setScale(1.3, 1).setDepth(-7000);
+          this.things.set("board", this.add.image(p.x, p.y, "board").setOrigin(0.5, 0.92).setScale(0.7).setDepth(p.y));
           this.block(p.x, p.y - 6, 66, 14);
           this.label(p.x, p.y - 92, this.t("game.place.board"));
           break;
         case "chest":
+          this.add.image(p.x, p.y - 2, "soft-shadow").setScale(0.9, 0.8).setDepth(-7000);
           this.chest = this.add.image(p.x, p.y, "chest").setOrigin(0.5, 0.9).setScale(0.62).setDepth(p.y);
+          this.things.set("chest", this.chest);
           this.block(p.x, p.y - 8, 40, 16);
           break;
         case "bridge":
@@ -225,10 +277,115 @@ export class VillageScene extends Phaser.Scene {
           break;
         case "gate":
           this.gate = this.add.image(p.x, p.y, "gate").setOrigin(0.5, 0.95).setScale(0.75).setDepth(p.y);
+          this.things.set("forestGate", this.gate);
           this.label(p.x, p.y - 104, this.t("game.place.forest"));
           break;
       }
     }
+  }
+
+  /** Lily pads, reeds, and slow ripples along the river and in the fountain. */
+  private buildWaterLife() {
+    const rand = mulberry32(7);
+    for (let y = 70; y < WORLD_H - 40; y += 90) {
+      if (Math.abs(y - RIVER.bridgeY) < 70) continue;
+      const cx = RIVER.xAt(y);
+      const bank = rand() > 0.5 ? 1 : -1;
+      this.add
+        .image(cx + bank * (RIVER.width / 2 + 2), y + rand() * 30, "reeds")
+        .setOrigin(0.5, 0.95)
+        .setScale(0.7)
+        .setDepth(y + 20);
+      if (rand() > 0.45) {
+        const lx = cx + (rand() - 0.5) * 26;
+        const ly = y + 40;
+        const pad = this.add.image(lx, ly, "lily").setScale(0.6).setDepth(-8500).setAngle(rand() * 360);
+        if (!this.reducedMotion) {
+          this.tweens.add({ targets: pad, y: ly + 3, angle: pad.angle + 8, duration: 2600 + rand() * 1400, yoyo: true, repeat: -1, ease: "Sine.inOut" });
+          this.ripple(lx, ly, 0.5, rand() * 3000);
+        }
+      }
+    }
+    if (!this.reducedMotion) {
+      this.ripple(PLAZA.x, PLAZA.y + 4, 0.9, 0, 4);
+      this.ripple(PLAZA.x - 12, PLAZA.y + 8, 0.7, 1300, 4);
+    }
+  }
+
+  private ripple(x: number, y: number, scale: number, delay: number, depthOffset = 0) {
+    const r = this.add.image(x, y, "ripple").setScale(scale * 0.4).setAlpha(0).setDepth(depthOffset ? PLAZA.y + 18 + depthOffset : -8400);
+    this.tweens.add({
+      targets: r,
+      scale: { from: scale * 0.4, to: scale * 1.1 },
+      alpha: { from: 0.7, to: 0 },
+      duration: 2200,
+      repeat: -1,
+      repeatDelay: 600,
+      delay,
+      ease: "Sine.out",
+    });
+  }
+
+  private buildLamps() {
+    for (const l of LAMPS) {
+      this.add.image(l.x, l.y, "lamp").setOrigin(0.5, 0.95).setScale(0.55).setDepth(l.y);
+      this.block(l.x, l.y - 3, 10, 8);
+      const light = this.add
+        .image(l.x, l.y - 52, "light")
+        .setScale(0.9)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setAlpha(0)
+        .setDepth(20_001);
+      this.lampLights.push(light);
+    }
+  }
+
+  /** Proximity ring, key prompt, objective beacon, and off-screen arrow. */
+  private buildGuidance() {
+    this.highlight = this.add.image(0, 0, "ring").setVisible(false).setDepth(-6900);
+    if (!this.reducedMotion) {
+      this.tweens.add({ targets: this.highlight, alpha: { from: 1, to: 0.45 }, duration: 700, yoyo: true, repeat: -1, ease: "Sine.inOut" });
+    }
+    this.prompt = this.add
+      .text(0, 0, "E", {
+        fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif",
+        fontSize: "13px",
+        fontStyle: "bold",
+        color: "#2a2140",
+        backgroundColor: "#fff7d6",
+        padding: { x: 7, y: 3 },
+        resolution: Math.max(2, this.dpr * 2),
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(9200)
+      .setVisible(false);
+    this.beacon = this.add.image(0, 0, "beacon").setOrigin(0.5, 1).setBlendMode(Phaser.BlendModes.ADD).setVisible(false);
+    if (!this.reducedMotion) {
+      this.tweens.add({ targets: this.beacon, alpha: { from: 0.95, to: 0.5 }, scaleX: { from: 1, to: 0.85 }, duration: 1100, yoyo: true, repeat: -1, ease: "Sine.inOut" });
+    }
+    this.edgeArrow = this.add.image(0, 0, "edge-arrow").setDepth(21_000).setVisible(false);
+    if (!this.reducedMotion) {
+      this.dust = this.add.particles(0, 0, "glow", {
+        lifespan: 420,
+        speed: { min: 6, max: 20 },
+        angle: { min: 200, max: 340 },
+        scale: { start: 0.7, end: 0 },
+        alpha: { start: 0.55, end: 0 },
+        tint: 0xd9c49c,
+        emitting: false,
+      });
+    }
+  }
+
+  private setTracked(id: InteractableId | null) {
+    this.tracked = id;
+    const at = id && this.interactables.find((i) => i.id === id);
+    if (!at) {
+      this.beacon.setVisible(false);
+      this.edgeArrow.setVisible(false);
+      return;
+    }
+    this.beacon.setPosition(at.x, at.y + 6).setDepth(at.y - 30).setVisible(true);
   }
 
   private buildForestFence() {
@@ -261,6 +418,8 @@ export class VillageScene extends Phaser.Scene {
         });
       }
       sprite.setOrigin(0.5, 0.92).setDepth(npc.y);
+      this.things.set(npc.id, sprite);
+      this.add.image(npc.x, npc.y - 2, "soft-shadow").setScale(0.6, 0.7).setDepth(-7000);
       this.block(npc.x, npc.y - 6, 26, 12);
       this.label(npc.x, npc.y - (npc.id === "guide" ? 46 : 52), this.t(`game.npc.${npc.id}.name`), true);
       if (!this.reducedMotion) {
@@ -294,6 +453,7 @@ export class VillageScene extends Phaser.Scene {
     body.setSize(30, 14).setOffset(17, 60);
     this.physics.add.collider(this.player, this.obstacles);
     this.playerLabel = this.label(SPAWN.x, SPAWN.y - 44, "", true);
+    this.playerShadow = this.add.image(SPAWN.x, SPAWN.y, "soft-shadow").setScale(0.55, 0.6).setDepth(-7000);
     this.lastPos = { x: SPAWN.x, y: SPAWN.y };
   }
 
@@ -346,6 +506,14 @@ export class VillageScene extends Phaser.Scene {
     }
     this.nightOverlay.setFillStyle(color, alpha);
     const night = alpha > 0.3;
+    const glow = night ? 0.85 : alpha > 0 ? 0.4 : 0;
+    for (const l of this.lampLights) {
+      this.tweens.killTweensOf(l);
+      l.setAlpha(glow);
+      if (glow && !this.reducedMotion) {
+        this.tweens.add({ targets: l, alpha: glow * 0.8, duration: 1800 + Math.random() * 900, yoyo: true, repeat: -1, ease: "Sine.inOut" });
+      }
+    }
     if (night && !this.fireflies && !this.reducedMotion) {
       this.fireflies = this.add
         .particles(0, 0, "glow", {
@@ -414,6 +582,7 @@ export class VillageScene extends Phaser.Scene {
         kb.resetKeys();
       }
     }
+    this.setFocus(!enabled);
     if (!enabled) {
       this.target = null;
       this.path = [];
@@ -448,7 +617,9 @@ export class VillageScene extends Phaser.Scene {
       if (marker) this.setMarker(id, marker);
     }
 
-    this.chest.setTexture(w.chestOpen ? "chest-open" : "chest");
+    if (this.chestOpen === false && w.chestOpen) this.openChest();
+    else if (this.chestOpen !== true || !w.chestOpen) this.chest.setTexture(w.chestOpen ? "chest-open" : "chest");
+    this.chestOpen = w.chestOpen;
     this.gate.setTexture(w.forestUnlocked ? "gate-open" : "gate");
     const gateBody = this.gateBlock.body as Phaser.Physics.Arcade.StaticBody;
     gateBody.enable = !w.forestUnlocked;
@@ -481,11 +652,14 @@ export class VillageScene extends Phaser.Scene {
     for (const h of this.houses) h.parts.forEach((p) => p.destroy());
     this.houses = [];
     this.interactables = this.interactables.filter((i) => !i.id.startsWith("house:"));
+    for (const id of [...this.things.keys()]) if (id.startsWith("house:")) this.things.delete(id);
 
     w.family.slice(0, HOUSE_SLOTS.length).forEach((m, idx) => {
       const slot = HOUSE_SLOTS[idx]!;
       const parts: Phaser.GameObjects.GameObject[] = [];
-      parts.push(this.add.image(slot.x, slot.y, ensureHouseTexture(this, m.color)).setOrigin(0.5, 0.95).setScale(0.7).setDepth(slot.y));
+      const house = this.add.image(slot.x, slot.y, ensureHouseTexture(this, m.color)).setOrigin(0.5, 0.95).setScale(0.7).setDepth(slot.y);
+      parts.push(house);
+      this.things.set(`house:${m.memberId}`, house);
       parts.push(this.block(slot.x, slot.y - 30, 104, 52));
       parts.push(this.label(slot.x, slot.y - 112, this.t("game.place.house", { name: m.name })));
       if (m.memberId !== w.player.memberId) {
@@ -511,6 +685,7 @@ export class VillageScene extends Phaser.Scene {
       this.houses.push({ memberId: m.memberId, parts });
       this.interactables.push({ id: `house:${m.memberId}`, x: slot.x, y: slot.y + 14, radius: 52 });
     });
+    if (this.tracked) this.setTracked(this.tracked);
   }
 
   // --- Interaction ------------------------------------------------------------
@@ -526,10 +701,44 @@ export class VillageScene extends Phaser.Scene {
 
   private interact() {
     if (!this.inputEnabled || !this.nearby) return;
-    this.bridge.emit("interact", this.nearby);
+    this.use(this.nearby);
   }
 
-  private celebrate(x: number, y: number) {
+  private use(id: InteractableId) {
+    this.feedback(id);
+    this.bridge.emit("interact", id);
+  }
+
+  /** Hop (characters, small props) plus a ring flash, so every use registers. */
+  private feedback(id: InteractableId) {
+    if (this.reducedMotion) return;
+    const obj = this.things.get(id);
+    const at = this.interactables.find((i) => i.id === id);
+    if (obj && HOPPERS.includes(id) && !this.tweens.isTweening(obj)) {
+      this.tweens.add({ targets: obj, y: obj.y - 7, duration: 110, yoyo: true, ease: "Quad.out" });
+    }
+    if (at) {
+      const s = (RING_SCALE[id] ?? 1) * 0.9;
+      const flash = this.add.image(at.x, at.y, "ring").setScale(s).setDepth(-6890);
+      this.tweens.add({ targets: flash, scale: s * 1.5, alpha: 0, duration: 420, ease: "Cubic.out", onComplete: () => flash.destroy() });
+    }
+  }
+
+  private celebrate(at?: InteractableId, items: RewardFloat[] = []) {
+    const spot = at && this.interactables.find((i) => i.id === at);
+    const x = spot ? spot.x : this.player.x;
+    const y = spot ? spot.y - 40 : this.player.y - 30;
+    if (at === "chest" && this.chestOpen === false) {
+      // Claimed before the refreshed snapshot arrives: play the lid now.
+      this.chestOpen = true;
+      this.openChest(items);
+      return;
+    }
+    this.burst(x, y);
+    this.floatRewards(x, y - 10, items);
+  }
+
+  private burst(x: number, y: number) {
     if (this.reducedMotion) return;
     const burst = this.add
       .particles(x, y, "sparkle", {
@@ -545,6 +754,64 @@ export class VillageScene extends Phaser.Scene {
       .setDepth(15_000);
     burst.explode(36);
     this.time.delayedCall(1400, () => burst.destroy());
+  }
+
+  private floatRewards(x: number, y: number, items: RewardFloat[]) {
+    items.forEach((item, i) => {
+      const txt = this.add
+        .text(x, y - i * 20, item.text, {
+          fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif",
+          fontSize: "15px",
+          fontStyle: "bold",
+          color: item.color,
+          stroke: "#2a2140",
+          strokeThickness: 4,
+          resolution: Math.max(2, this.dpr * 2),
+        })
+        .setOrigin(0.5, 1)
+        .setDepth(15_100)
+        .setAlpha(0);
+      if (this.reducedMotion) {
+        txt.setAlpha(1);
+        this.time.delayedCall(1400, () => txt.destroy());
+        return;
+      }
+      this.tweens.add({
+        targets: txt,
+        y: y - i * 20 - 48,
+        alpha: { from: 1, to: 0 },
+        duration: 1300,
+        delay: i * 140,
+        ease: "Cubic.out",
+        onStart: () => txt.setAlpha(1),
+        onComplete: () => txt.destroy(),
+      });
+    });
+  }
+
+  /** Shake, pop the lid, glow, and burst. Falls back to a plain swap with reduced motion. */
+  private openChest(items: RewardFloat[] = []) {
+    const c = this.chest;
+    const done = () => {
+      c.setTexture("chest-open");
+      this.burst(c.x, c.y - 30);
+      this.floatRewards(c.x, c.y - 46, items);
+      if (this.reducedMotion) return;
+      const base = c.scale;
+      this.tweens.add({ targets: c, scale: base * 1.15, duration: 140, yoyo: true, ease: "Back.out" });
+      const light = this.add.image(c.x, c.y - 24, "light").setBlendMode(Phaser.BlendModes.ADD).setScale(0.3).setDepth(c.depth + 1);
+      this.tweens.add({ targets: light, scale: 1.1, alpha: 0, duration: 700, ease: "Cubic.out", onComplete: () => light.destroy() });
+    };
+    if (this.reducedMotion) return done();
+    this.tweens.add({ targets: c, angle: { from: -6, to: 6 }, duration: 70, yoyo: true, repeat: 3, onComplete: () => { c.setAngle(0); done(); } });
+  }
+
+  /** Gentle push-in while a menu or dialogue is open. */
+  private setFocus(on: boolean) {
+    if (on === this.focused) return;
+    this.focused = on;
+    if (this.reducedMotion) return;
+    this.cameras.main.zoomTo(on ? this.baseZoom * 1.06 : this.baseZoom, 320, "Sine.easeInOut", true);
   }
 
   private enterMemory(session: MemorySession) {
@@ -581,10 +848,13 @@ export class VillageScene extends Phaser.Scene {
     const css = Math.min(w, h) / this.dpr;
     const base = Phaser.Math.Clamp(css / 420, 1, 1.6) * this.dpr;
     const cover = Math.max(w / WORLD_W, h / WORLD_H);
-    this.cameras.main.setZoom(Math.max(base, cover));
+    this.baseZoom = Math.max(base, cover);
+    this.cameras.main.setZoom(this.focused && !this.reducedMotion ? this.baseZoom * 1.06 : this.baseZoom);
+    const cam = this.cameras.main;
+    cam.setDeadzone(this.reducedMotion ? 0 : (w * 0.05) / this.baseZoom, this.reducedMotion ? 0 : (h * 0.05) / this.baseZoom);
   }
 
-  update(_time: number, delta: number) {
+  update(time: number, delta: number) {
     if (!this.player?.body) return;
     const body = this.player.body as Phaser.Physics.Arcade.Body;
     let vx = 0;
@@ -640,13 +910,105 @@ export class VillageScene extends Phaser.Scene {
 
     this.player.setDepth(this.player.y);
     this.playerLabel.setPosition(this.player.x, this.player.y - 44);
+    this.playerShadow.setPosition(this.player.x, this.player.y - 2);
+    this.animatePlayer(time, delta, len > 0);
 
     const near = this.nearest();
     if (near !== this.nearby) {
       this.nearby = near;
       for (const [id, img] of this.markers) img.setScale(id === near ? 0.7 : 0.55);
+      this.showHighlight(near);
       this.bridge.emit("nearby", near);
     }
+    this.updateEdgeArrow();
+
+    this.playerEmitMs += delta;
+    if (this.playerEmitMs > 120) {
+      this.playerEmitMs = 0;
+      const last = this.bridge.latest("player");
+      if (!last || Math.abs(last.x - this.player.x) + Math.abs(last.y - this.player.y) > 1) {
+        this.bridge.emit("player", { x: Math.round(this.player.x), y: Math.round(this.player.y) });
+      }
+    }
+  }
+
+  /** Breathing while idle, a stride bob, dust puffs, and bushes that rustle as you pass. */
+  private animatePlayer(time: number, delta: number, moving: boolean) {
+    if (this.reducedMotion) return;
+    const bob = moving ? 1 - 0.03 * Math.abs(Math.sin(time / 75)) : 1 + 0.016 * Math.sin(time / 420);
+    this.player.setScale(AVATAR_SCALE, AVATAR_SCALE * bob);
+    if (!moving) return;
+    this.dustMs += delta;
+    if (this.dust && this.dustMs > 170) {
+      this.dustMs = 0;
+      this.dust.setDepth(this.player.y - 1);
+      this.dust.emitParticleAt(this.player.x + Phaser.Math.Between(-4, 4), this.player.y - 2, 1);
+    }
+    this.rustleMs += delta;
+    if (this.rustleMs < 100) return;
+    this.rustleMs = 0;
+    for (const b of this.bushes) {
+      if (this.rustling.has(b) || Math.abs(b.x - this.player.x) > 30 || Math.abs(b.y - this.player.y) > 24) continue;
+      this.rustling.add(b);
+      this.tweens.add({
+        targets: b,
+        angle: { from: -5, to: 5 },
+        duration: 80,
+        yoyo: true,
+        repeat: 2,
+        onComplete: () => {
+          b.setAngle(0);
+          this.time.delayedCall(400, () => this.rustling.delete(b));
+        },
+      });
+    }
+  }
+
+  private showHighlight(id: InteractableId | null) {
+    const at = id && this.interactables.find((i) => i.id === id);
+    if (!at) {
+      this.highlight.setVisible(false);
+      this.prompt.setVisible(false);
+      return;
+    }
+    const s = RING_SCALE[id] ?? (id.startsWith("house:") ? 1.1 : 0.8);
+    this.highlight.setPosition(at.x, at.y).setScale(s).setVisible(true);
+    // Key hint sits at the ring's right edge so it never covers names or sprites.
+    this.prompt.setPosition(at.x + 64 * s + 10, at.y + 8).setDepth(at.y + 40).setVisible(!this.touch);
+  }
+
+  /** Clamp the tracked objective to the viewport edge when it is off-screen. */
+  private updateEdgeArrow() {
+    const at = this.tracked && this.interactables.find((i) => i.id === this.tracked);
+    if (!at || !this.inputEnabled) {
+      this.edgeArrow.setVisible(false);
+      return;
+    }
+    const cam = this.cameras.main;
+    const v = cam.worldView;
+    const k = this.dpr / cam.zoom;
+    const left = v.x + EDGE_INSET.left * k;
+    const right = v.right - EDGE_INSET.right * k;
+    // Phones stack the HUD taller, so keep the arrow below the tracker there.
+    const topCss = this.scale.width / this.dpr < 640 ? 190 : EDGE_INSET.top;
+    const top = v.y + Math.min(topCss * k, v.height * 0.35);
+    const bottom = v.bottom - EDGE_INSET.bottom * k;
+    const tx = at.x;
+    const ty = at.y - 30;
+    if (tx > left && tx < right && ty > top && ty < bottom) {
+      this.edgeArrow.setVisible(false);
+      return;
+    }
+    const cx = (left + right) / 2;
+    const cy = (top + bottom) / 2;
+    const dx = tx - cx;
+    const dy = ty - cy;
+    const scale = Math.min(dx ? (dx > 0 ? right - cx : left - cx) / dx : Infinity, dy ? (dy > 0 ? bottom - cy : top - cy) / dy : Infinity);
+    this.edgeArrow
+      .setPosition(cx + dx * scale, cy + dy * scale)
+      .setRotation(Math.atan2(dy, dx))
+      .setScale(0.7 * k)
+      .setVisible(true);
   }
 
   private arrive() {
@@ -658,7 +1020,7 @@ export class VillageScene extends Phaser.Scene {
     if (pending) {
       const at = this.interactables.find((i) => i.id === pending);
       if (at && Phaser.Math.Distance.Between(this.player.x, this.player.y, at.x, at.y) < at.radius * 1.4) {
-        this.bridge.emit("interact", pending);
+        this.use(pending);
       }
     }
   }

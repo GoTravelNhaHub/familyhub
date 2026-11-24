@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { GameState, Quest, Resources } from "../types";
 import { RewardChips } from "./icons";
 import { AvatarPortrait } from "./AvatarEditor";
 
 export type QuestAction = "accept" | "cancel" | "claim" | "markDone" | "play";
+
+const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 
 export function useResourceLabel() {
   const { t } = useTranslation();
@@ -26,15 +28,23 @@ export function Panel({
 }) {
   const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
+  const [closing, setClosing] = useState(false);
+  // Play the exit animation, then hand control back to the world.
+  const requestClose = useCallback(() => {
+    if (reducedMotion()) return onClose();
+    setClosing(true);
+    window.setTimeout(onClose, 140);
+  }, [onClose]);
   useEffect(() => {
-    const el = ref.current;
-    el?.querySelector<HTMLElement>("button:not(.g-close)")?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    ref.current?.querySelector<HTMLElement>("button:not(.g-close)")?.focus();
+  }, []);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && requestClose();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [requestClose]);
   return (
-    <div className="g-scrim" onClick={onClose}>
+    <div className={`g-scrim ${closing ? "closing" : ""}`} onClick={requestClose}>
       <div
         ref={ref}
         className={`g-panel ${wide ? "wide" : ""}`}
@@ -46,7 +56,7 @@ export function Panel({
         <div className="g-panel-head">
           {icon && <div className="g-panel-icon">{icon}</div>}
           <h2>{title}</h2>
-          <button type="button" className="g-close" onClick={onClose} aria-label={t("game.ui.close")}>
+          <button type="button" className="g-close" onClick={requestClose} aria-label={t("game.ui.close")}>
             ×
           </button>
         </div>
@@ -171,15 +181,33 @@ export function Dialogue({
   options: DialogueOption[];
   children?: ReactNode;
 }) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const last = step >= lines.length - 1;
   useEffect(() => setStep(0), [lines.join("|")]);
+  const line = lines[step] ?? "";
+  const [shown, setShown] = useState(line.length);
+  useEffect(() => {
+    if (reducedMotion()) return setShown(line.length);
+    setShown(0);
+    const id = window.setInterval(() => setShown((n) => (n >= line.length ? (window.clearInterval(id), n) : n + 2)), 18);
+    return () => window.clearInterval(id);
+  }, [line]);
+  const typing = shown < line.length;
+  // First tap finishes the line, the next one advances.
+  const advance = () => (typing ? setShown(line.length) : setStep((s) => s + 1));
   return (
     <div className="g-dialogue">
-      <p className="g-speech" aria-live="polite">{lines[step]}</p>
-      {!last ? (
+      <p className="g-speech" onClick={() => typing && setShown(line.length)}>
+        <span aria-hidden>{line.slice(0, shown)}</span>
+        <span className="g-speech-ghost" aria-hidden>{line.slice(shown)}</span>
+        <span className="sr-only" aria-live="polite">{line}</span>
+      </p>
+      {!last || typing ? (
         <div className="g-actions">
-          <button type="button" onClick={() => setStep((s) => s + 1)}>{"▸"}</button>
+          <button type="button" className="g-next" onClick={advance} aria-label={t("game.ui.next")}>
+            {typing ? "…" : "▸"}
+          </button>
         </div>
       ) : (
         <>

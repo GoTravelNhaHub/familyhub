@@ -78,6 +78,16 @@ export const INTERACTABLES: Interactable[] = [
   { id: "forestGate", x: FOREST_FENCE_X - 30, y: 566, radius: 70 },
 ];
 
+/** Street lamps along the main paths; they glow after dusk. */
+export const LAMPS: { x: number; y: number }[] = [
+  { x: 758, y: 392 },
+  { x: 842, y: 392 },
+  { x: 758, y: 760 },
+  { x: 842, y: 760 },
+  { x: 1104, y: 522 },
+  { x: 1104, y: 600 },
+];
+
 /** Deterministic PRNG so the village looks the same for everyone, every visit. */
 export function mulberry32(seed: number) {
   let a = seed >>> 0;
@@ -110,6 +120,7 @@ export function isOpenGround(x: number, y: number, margin = 0): boolean {
   if (Math.abs(x - 800) < 170 + margin && y > 90 && y < 360) return false; // academy
   if (Math.abs(x - FOREST_FENCE_X) < 34 + margin) return false;
   for (const h of HOUSE_SLOTS) if (Math.abs(x - h.x) < 80 + margin && y > h.y - 120 && y < h.y + 40) return false;
+  for (const l of LAMPS) if (Math.hypot(x - l.x, y - l.y) < 30 + margin) return false;
   for (const i of INTERACTABLES) if (Math.hypot(x - i.x, y - i.y) < i.radius + 20 + margin) return false;
   return true;
 }

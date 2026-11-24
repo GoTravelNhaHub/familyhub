@@ -22,6 +22,11 @@ export interface AvatarConfig {
   accessory: Opt<"accessory">;
 }
 
+/** The Village Guide NPC's look (scene sprite and dialogue portrait). */
+export const GUIDE_LOOK: AvatarConfig = {
+  v: 1, skin: "#eab68f", hair: "bun", hairColor: "#5a5f7a", outfit: "#0ea5a4", accessory: "glasses",
+};
+
 export type Facing = "down" | "left" | "right" | "up";
 export const FACINGS: Facing[] = ["down", "left", "right", "up"];
 

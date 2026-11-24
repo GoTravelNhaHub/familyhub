@@ -8,15 +8,19 @@ import { GameBridge, type InteractableId, type WorldSnapshot } from "../game/bri
 import { GameCanvas } from "../game/GameCanvas";
 import { gameApi, gameKeys, serverBackend, type GameBackend } from "../game/gameApi";
 import type { GameState, MemoryResult, Quest, Resources } from "../game/types";
-import type { AvatarConfig } from "../game/avatar";
+import { GUIDE_LOOK, type AvatarConfig } from "../game/avatar";
 import { AvatarEditor, AvatarPortrait } from "../game/ui/AvatarEditor";
 import { Dialogue, HouseCard, Panel, QuestBoard, QuestCard, useResourceLabel, type QuestAction } from "../game/ui/Panels";
 import { MemoryIntro, MemoryResultView } from "../game/ui/MemoryPanels";
-import { RESOURCE_ICONS, RewardChips } from "../game/ui/icons";
+import { ChestIcon, GateIcon, MapIcon, OwlIcon, RewardChips, ScrollIcon, ShirtIcon, SwapIcon } from "../game/ui/icons";
+import { Coach, Minimap, MenuButton, PlayerCard, QuestTracker, pickObjective, type CoachStep } from "../game/ui/Hud";
+import { SPAWN } from "../game/world";
 import "../game/game.css";
 
 const PLAYER_KEY = "fh.game.playerId";
-const HINT_KEY = "fh.game.hintSeen";
+const COACH_KEY = "fh.game.coach";
+const MAP_KEY = "fh.game.mapHidden";
+const FLOAT_COLOR: Record<keyof Resources, string> = { xp: "#86efac", coins: "#fde047", crystals: "#d8b4fe", materials: "#fdba74" };
 
 function readLocal(key: string): string | null {
   try {
@@ -150,12 +154,36 @@ export function GameSession({
   const [nearby, setNearby] = useState<InteractableId | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [hint, setHint] = useState(() => readLocal(HINT_KEY) !== "1");
+  const [ready, setReady] = useState(false);
+  const [player, setPlayer] = useState<{ x: number; y: number } | null>(null);
+  const [mapOpen, setMapOpen] = useState(() => readLocal(MAP_KEY) !== "1");
+  const [coach, setCoach] = useState<CoachStep | null>(() => {
+    const v = readLocal(COACH_KEY);
+    return v === "done" ? null : v === "1" || v === "2" ? (Number(v) as CoachStep) : 0;
+  });
   const touch = useMemo(() => typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches, []);
 
   const stateQ = useQuery({ queryKey: backend.key, queryFn: backend.state });
   const state = stateQ.data;
   const refresh = useCallback(() => qc.invalidateQueries({ queryKey: backend.key }), [qc, backend.key]);
+  const objective = useMemo(() => (state ? pickObjective(state) : null), [state]);
+
+  const advanceCoach = useCallback((from: CoachStep) => {
+    setCoach((c) => {
+      if (c !== from) return c;
+      const next = c < 2 ? ((c + 1) as CoachStep) : null;
+      writeLocal(COACH_KEY, next === null ? "done" : String(next));
+      return next;
+    });
+  }, []);
+  const skipCoach = () => {
+    writeLocal(COACH_KEY, "done");
+    setCoach(null);
+  };
+  // Returning players who already met the guide skip the coach.
+  useEffect(() => {
+    if (coach !== null && state?.quests.find((q) => q.key === "story.welcome")?.status === "rewarded") skipCoach();
+  }, [state, coach]);
 
   useEffect(() => () => bridge.clear(), [bridge]);
   useEffect(() => {
@@ -164,15 +192,23 @@ export function GameSession({
   useEffect(() => {
     bridge.emit("setInputEnabled", panel === null);
   }, [panel, bridge]);
+  useEffect(() => {
+    bridge.emit("track", coach === 1 ? "guide" : objective?.target ?? null);
+  }, [objective?.target, coach, bridge]);
 
+  const nearbyRef = useRef(nearby);
+  nearbyRef.current = nearby;
   const reward = useCallback(
-    (r: Resources, text: string) => {
+    (r: Resources, text: string, at?: InteractableId) => {
       const id = Date.now() + Math.random();
       setToasts((ts) => [...ts, { id, reward: r, text }]);
       setTimeout(() => setToasts((ts) => ts.filter((x) => x.id !== id)), 3200);
-      bridge.emit("celebrate", {});
+      const items = (Object.keys(FLOAT_COLOR) as (keyof Resources)[])
+        .filter((k) => r[k] > 0)
+        .map((k) => ({ text: `+${r[k]} ${label(k)}`, color: FLOAT_COLOR[k] }));
+      bridge.emit("celebrate", { at: at && (at === "chest" || nearbyRef.current === at) ? at : undefined, items });
     },
-    [bridge],
+    [bridge, label],
   );
   const fail = (e: unknown) => setError(e instanceof ApiError ? t(`game.error.${e.message}`, { defaultValue: e.message }) : t("game.error.generic"));
 
@@ -187,7 +223,7 @@ export function GameSession({
         qc.invalidateQueries({ queryKey: ["balances"] });
       } else if (action === "claim") {
         const res = await backend.claim(quest.key);
-        reward(res.reward, t(quest.titleKey, quest.params));
+        reward(res.reward, t(quest.titleKey, quest.params), quest.npc);
       }
     },
     onSuccess: refresh,
@@ -200,7 +236,7 @@ export function GameSession({
   const chestMut = useMutation({
     mutationFn: () => backend.claimChest(),
     onSuccess: (res) => {
-      reward(res.reward, t("game.chest.title"));
+      reward(res.reward, t("game.chest.title"), "chest");
       refresh();
     },
     onError: fail,
@@ -241,10 +277,14 @@ export function GameSession({
   // Phaser -> React events, registered once per session.
   useEffect(() => {
     const offs = [
+      bridge.on("ready", () => setReady(true)),
       bridge.on("nearby", setNearby),
+      bridge.on("player", (p) => {
+        setPlayer(p);
+        if (Math.hypot(p.x - SPAWN.x, p.y - SPAWN.y) > 48) advanceCoach(0);
+      }),
       bridge.on("interact", (id) => {
-        setHint(false);
-        writeLocal(HINT_KEY, "1");
+        if (id === "guide") advanceCoach(1);
         if (id === "guide" || id === "owl") setPanel({ kind: "npc", npc: id });
         else if (id === "academy") setPanel({ kind: "npc", npc: "owl" });
         else if (id === "board") setPanel({ kind: "board" });
@@ -254,7 +294,10 @@ export function GameSession({
       }),
     ];
     return () => offs.forEach((o) => o());
-  }, [bridge]);
+  }, [bridge, advanceCoach]);
+  useEffect(() => {
+    if (panel?.kind === "board") advanceCoach(2);
+  }, [panel, advanceCoach]);
 
   const panelRef = useRef(panel);
   panelRef.current = panel;
@@ -288,66 +331,60 @@ export function GameSession({
     <div className="play-root">
       <GameCanvas bridge={bridge} />
 
+      <div className={`g-boot ${ready ? "done" : ""}`} aria-hidden={ready}>
+        <div className="g-loader" />
+        {t("game.ui.loading")}
+      </div>
+
       {state && panel?.kind !== "playing" && (
-        <div className="g-hud">
-          <div className="g-hud-card">
-            <AvatarPortrait avatar={state.player.avatar} size={40} />
-            <div className="g-hud-info">
-              <div className="g-hud-name">
-                {state.player.name} <span className="g-lv">{t("game.ui.level", { level: state.player.level.level })}</span>
-              </div>
-              <div
-                className="g-xpbar"
-                role="progressbar"
-                aria-label={t("game.resource.xp")}
-                aria-valuemin={0}
-                aria-valuemax={state.player.level.span}
-                aria-valuenow={state.player.level.intoLevel}
-              >
-                <div style={{ width: `${Math.round((state.player.level.intoLevel / state.player.level.span) * 100)}%` }} />
-              </div>
-              <div className="g-res">
-                {(["coins", "crystals", "materials"] as const).map((k) => {
-                  const Icon = RESOURCE_ICONS[k];
-                  return (
-                    <span key={k} title={label(k)}>
-                      <Icon size={15} /> {state.player.resources[k]}
-                      <span className="sr-only"> {label(k)}</span>
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-          <div className="g-hud-buttons">
-            <span className="g-family-chip" title={state.family.name}>
-              {t("game.ui.familyLevel", { level: state.family.level.level })}
-            </span>
-            <button type="button" onClick={() => setPanel({ kind: "board" })}>{t("game.ui.quests")}</button>
-            <button type="button" className="ghost" onClick={() => setPanel({ kind: "avatar" })}>{t("game.ui.avatar")}</button>
-            {canSwitch && (
-              <button type="button" className="ghost" onClick={onSwitch}>{t("game.ui.switchPlayer")}</button>
+        <div className={`g-hud ${panel ? "dimmed" : ""}`}>
+          <div className="g-hud-left">
+            <PlayerCard state={state} />
+            {objective && (
+              <QuestTracker
+                objective={objective}
+                onOpen={() => setPanel({ kind: "board" })}
+                onGo={objective.target && objective.target !== nearby ? () => bridge.emit("walkTo", { id: objective.target! }) : null}
+              />
             )}
-            {backend.guest ? (
-              <Link to="/register" className="g-link g-link-cta">{t("game.guest.save")}</Link>
-            ) : (
-              <Link to="/" className="g-link">{t("game.ui.dashboard")}</Link>
+          </div>
+          <div className="g-hud-right">
+            <div className="g-menu">
+              <MenuButton
+                icon={<ScrollIcon />}
+                label={t("game.ui.quests")}
+                badge={state.quests.filter((q) => q.status === "completed" || q.status === "available").length}
+                onClick={() => setPanel({ kind: "board" })}
+                className={coach === 2 ? "g-coach-target" : ""}
+              />
+              <MenuButton icon={<ShirtIcon />} label={t("game.ui.avatar")} onClick={() => setPanel({ kind: "avatar" })} />
+              <MenuButton
+                icon={<MapIcon />}
+                label={t(mapOpen ? "game.ui.mapHide" : "game.ui.mapShow")}
+                onClick={() => {
+                  writeLocal(MAP_KEY, mapOpen ? "1" : null);
+                  setMapOpen(!mapOpen);
+                }}
+                className={mapOpen ? "on" : ""}
+              />
+              {canSwitch && <MenuButton icon={<SwapIcon />} label={t("game.ui.switchPlayer")} onClick={() => onSwitch?.()} />}
+              {backend.guest ? (
+                <Link to="/register" className="g-link g-link-cta">{t("game.guest.save")}</Link>
+              ) : (
+                <Link to="/" className="g-link">{t("game.ui.dashboard")}</Link>
+              )}
+            </div>
+            {mapOpen && (
+              <Minimap state={state} player={player} tracked={coach === 1 ? "guide" : objective?.target ?? null} onWalk={(d) => bridge.emit("walkTo", d)} />
             )}
           </div>
         </div>
       )}
 
-      {panel === null && hint && (
-        <div className="g-hint" role="status">
-          {t(touch ? "game.ui.hintTouch" : "game.ui.hintKeys")}
-          <button type="button" className="ghost small" onClick={() => { setHint(false); writeLocal(HINT_KEY, "1"); }}>
-            {t("game.ui.gotIt")}
-          </button>
-        </div>
-      )}
+      {panel === null && coach !== null && ready && <Coach step={coach} touch={!!touch} onSkip={skipCoach} />}
 
       {panel === null && nearbyLabel && (
-        <button type="button" className="g-interact" onClick={() => bridge.emit("triggerInteract")}>
+        <button type="button" className="g-interact" key={nearby} onClick={() => bridge.emit("triggerInteract")}>
           {nearbyLabel}
           {!touch && <kbd>E</kbd>}
         </button>
@@ -445,7 +482,11 @@ function PanelView(props: {
               { label: t("game.ui.bye"), onSelect: onClose },
             ];
       return (
-        <Panel title={t(`game.npc.${panel.npc}.name`)} onClose={onClose}>
+        <Panel
+          title={t(`game.npc.${panel.npc}.name`)}
+          icon={panel.npc === "guide" ? <AvatarPortrait avatar={GUIDE_LOOK} size={36} /> : <OwlIcon size={40} />}
+          onClose={onClose}
+        >
           <Dialogue lines={lines} options={topic ? [{ label: t("game.ui.back"), onSelect: () => setTopic(null) }] : options}>
             {!topic && quests.map((q) => <QuestCard key={q.key} quest={q} busy={busy} onAction={props.onQuestAction} />)}
           </Dialogue>
@@ -454,13 +495,13 @@ function PanelView(props: {
     }
     case "board":
       return (
-        <Panel title={t("game.place.board")} onClose={onClose} wide>
+        <Panel title={t("game.place.board")} icon={<ScrollIcon size={30} />} onClose={onClose} wide>
           <QuestBoard state={state} busy={busy} guest={props.guest} onAction={props.onQuestAction} />
         </Panel>
       );
     case "chest":
       return (
-        <Panel title={t("game.chest.title")} onClose={onClose}>
+        <Panel title={t("game.chest.title")} icon={<ChestIcon size={40} />} onClose={onClose}>
           {state.dailyChest.claimed ? (
             <p>{t("game.chest.claimed")}</p>
           ) : (
@@ -479,7 +520,7 @@ function PanelView(props: {
     case "gate": {
       const open = state.player.zones.includes("forest");
       return (
-        <Panel title={t("game.npc.guardian.name")} onClose={onClose}>
+        <Panel title={t("game.npc.guardian.name")} icon={<GateIcon size={40} />} onClose={onClose}>
           <p className="g-speech">
             {open ? t("game.npc.guardian.open", { name }) : t("game.npc.guardian.locked", { level: 3, current: state.player.level.level })}
           </p>
